@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"D:/Tarea.Emprendeurismo/SISTEMA\" 2>/dev/null && echo \"---PADRE---\" && ls -la \"D:/Tarea.Emprendeurismo\" 2>/dev/null)"
+    ]
+  }
+}
