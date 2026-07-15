@@ -34,3 +34,5 @@ dist-ssr
 # Archivos locales que no van al deploy
 _version-simple-html/
 *.zip
+.vercel
+.wrangler
