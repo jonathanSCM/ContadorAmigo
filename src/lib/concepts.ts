@@ -147,6 +147,22 @@ export const CONCEPTS: Concept[] = [
     full:
       "Es todo lo que pusiste para arrancar y sostener tu emprendimiento: mercadería, herramientas, equipos y efectivo. En el Régimen Simplificado, tu capital define la categoría y el monto fijo que pagas.",
   },
+  {
+    key: "cierre-gestion",
+    term: "Cierre de Gestión",
+    short: "El fin del año contable de tu negocio (no siempre es en diciembre).",
+    full:
+      "Es la fecha en que cierra tu año contable para calcular el IUE. En Bolivia varía según el rubro: comercio y servicios cierran el 31 de diciembre, la industria el 31 de marzo, el sector agropecuario el 30 de junio y la minería el 30 de septiembre. Tienes 120 días después del cierre para declarar y pagar el IUE.",
+    example: "Una tienda de ropa (comercio) cierra su gestión el 31 de diciembre; una fábrica textil (industria) cierra el 31 de marzo.",
+  },
+  {
+    key: "ahorro-tributario",
+    term: "Ahorro tributario",
+    short: "Lo que dejas de pagar de IVA por exigir factura en tus compras.",
+    full:
+      "Cada vez que compras con factura, el 13% de esa compra se convierte en crédito fiscal y se resta del IVA que debes pagar por tus ventas. Ese descuento es tu ahorro tributario: dinero real que no sale de tu bolsillo gracias a pedir factura.",
+    example: "Si compras Bs 1.000 con factura, generas Bs 130 de crédito fiscal que reduce el IVA que pagarás.",
+  },
 ];
 
 export function findConcept(key: string): Concept | undefined {

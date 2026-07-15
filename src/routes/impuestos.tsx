@@ -3,16 +3,23 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { ConceptPopover } from "@/components/ConceptPopover";
 import { loadMovements, loadNit, type Movement } from "@/lib/storage";
+import { formatBs, IT_RATE, IUE_RATE, nextTaxDue } from "@/lib/tax";
 import {
-  calcMonthly,
-  formatBs,
-  IT_RATE,
-  IUE_RATE,
-  IVA_RATE,
-  nextTaxDue,
-} from "@/lib/tax";
-import { annualEstimate } from "@/lib/analysis";
+  annualEstimate,
+  periodRange,
+  profitAndLoss,
+  profitAndLossRange,
+  providerSummary,
+  type Period,
+} from "@/lib/analysis";
 import { compareRegimes, type RegimeOption } from "@/lib/regimes";
+import {
+  activeBusiness,
+  setSector,
+  type Business,
+} from "@/lib/profiles";
+import { gestionRange, SECTOR_INFO, DEFAULT_SECTOR, type Sector } from "@/lib/sectors";
+import { Info } from "lucide-react";
 
 export const Route = createFileRoute("/impuestos")({
   head: () => ({
@@ -21,24 +28,44 @@ export const Route = createFileRoute("/impuestos")({
       {
         name: "description",
         content:
-          "Calcula tu IVA, IT e IUE en Bolivia. Vencimientos según el último dígito de tu NIT.",
+          "Calcula tu IVA, IT e IUE en Bolivia por período exacto, con tu Cierre de Gestión real según tu rubro.",
       },
     ],
   }),
   component: Impuestos,
 });
 
+const PERIODOS: { id: Period; label: string }[] = [
+  { id: "dia", label: "Hoy" },
+  { id: "semana", label: "Esta semana" },
+  { id: "mes", label: "Este mes" },
+  { id: "anio", label: "Este año" },
+  { id: "todo", label: "Todo" },
+];
+
+const fmtDate = (d: Date) =>
+  d.toLocaleDateString("es-BO", { day: "numeric", month: "long", year: "numeric" });
+
 function Impuestos() {
   const [movs, setMovs] = useState<Movement[]>([]);
   const [nit, setNit] = useState("");
   const [capital, setCapital] = useState("22000");
+  const [period, setPeriod] = useState<Period>("mes");
+  const [biz, setBiz] = useState<Business | null>(null);
 
   useEffect(() => {
     setMovs(loadMovements());
     setNit(loadNit());
+    setBiz(activeBusiness());
   }, []);
 
-  const s = useMemo(() => calcMonthly(movs), [movs]);
+  const sector: Sector = biz?.sector ?? DEFAULT_SECTOR;
+  const isTaxPeriod = period === "mes" || period === "anio" || period === "todo";
+
+  const range = useMemo(() => periodRange(movs, period), [movs, period]);
+  const pnl = useMemo(() => profitAndLoss(movs, period), [movs, period]);
+  const gastosTotal = pnl.costoVentas + pnl.gastosOperativos;
+
   const due = useMemo(() => nextTaxDue(nit), [nit]);
   const annual = useMemo(() => annualEstimate(movs), [movs]);
   const comparison = useMemo(
@@ -52,88 +79,316 @@ function Impuestos() {
     [annual, capital],
   );
 
-  // IUE estimado: 25% de utilidad anual proyectada
-  const utilidadAnualEstimada = s.utilidad * 12;
-  const iueEstimado = Math.max(0, utilidadAnualEstimada) * IUE_RATE;
+  // Cierre de Gestión real (fecha según rubro, no un año calendario fijo).
+  const gestion = useMemo(() => gestionRange(sector), [sector]);
+  const gestionPnl = useMemo(
+    () => profitAndLossRange(movs, gestion.start, gestion.end),
+    [movs, gestion],
+  );
+  const iueGestion = Math.max(0, gestionPnl.utilidadOperativa) * IUE_RATE;
+  const gestionEnCurso = new Date() <= gestion.end;
+
+  const providers = useMemo(() => providerSummary(movs, period), [movs, period]);
+
+  const changeSector = (s: Sector) => {
+    if (!biz) return;
+    setSector(biz.id, s);
+    setBiz({ ...biz, sector: s });
+  };
 
   return (
     <AppShell>
-      <main className="mx-auto max-w-7xl space-y-8 p-6">
+      <main className="mx-auto max-w-7xl space-y-8 p-4 sm:p-6">
         <header className="animate-reveal">
           <h1 className="font-serif text-4xl italic">Tus impuestos, sin susto</h1>
           <p className="mt-2 max-w-2xl text-foreground/60">
-            Estos son los tres tributos principales que debes controlar como emprendedor formal en
-            Bolivia. Los cálculos se basan en tus movimientos del mes actual.
+            Elige el período que quieres revisar. Cada cálculo muestra exactamente sus fechas, para
+            que nunca te preguntes "¿esto de qué mes es?".
           </p>
         </header>
 
-        <section className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {/* IVA */}
-          <div className="animate-reveal [animation-delay:50ms] rounded-3xl bg-card p-6 ring-1 ring-black/5">
-            <div className="mb-4 flex items-center justify-between">
-              <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
-                IVA · 13%
-              </span>
-              <ConceptPopover conceptKey="iva" />
+        {/* Selector de período + fechas */}
+        <section className="animate-reveal [animation-delay:25ms] flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-card p-5 ring-1 ring-black/5">
+          <div className="flex flex-wrap gap-1 rounded-full bg-secondary p-1 text-xs font-bold">
+            {PERIODOS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setPeriod(p.id)}
+                className={`rounded-full px-3 py-1.5 transition-all sm:px-4 ${
+                  period === p.id ? "bg-foreground text-background" : "text-foreground/60"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-sm text-foreground/60">
+            Período: <span className="font-bold text-foreground">{fmtDate(range.start)}</span> —{" "}
+            <span className="font-bold text-foreground">{fmtDate(range.end)}</span>
+          </p>
+        </section>
+
+        {!isTaxPeriod ? (
+          // --- Resumen de caja (día / semana): informativo, no tributario ---
+          <section className="animate-reveal [animation-delay:50ms] space-y-4">
+            <div className="rounded-3xl bg-card p-8 ring-1 ring-black/5">
+              <p className="mb-1 text-xs uppercase text-foreground/50">
+                Resumen de caja · {PERIODOS.find((p) => p.id === period)?.label}
+              </p>
+              <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-3">
+                <div>
+                  <p className="text-xs uppercase text-foreground/50">Ingresos</p>
+                  <p className="mt-1 font-serif text-3xl italic text-success">
+                    {formatBs(pnl.ingresos)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase text-foreground/50">Gastos</p>
+                  <p className="mt-1 font-serif text-3xl italic text-danger">
+                    {formatBs(gastosTotal)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase text-foreground/50">Utilidad del período</p>
+                  <p
+                    className={`mt-1 font-serif text-3xl italic ${
+                      pnl.ingresos - gastosTotal >= 0 ? "text-foreground" : "text-danger"
+                    }`}
+                  >
+                    {formatBs(pnl.ingresos - gastosTotal)}
+                  </p>
+                </div>
+              </div>
             </div>
-            <p className="mb-1 text-xs uppercase text-foreground/50">A pagar este mes</p>
-            <p className="mb-4 font-serif text-4xl italic">{formatBs(s.ivaAPagar)}</p>
-            <div className="space-y-2 border-t border-border pt-4 text-sm">
-              <Row label="Débito fiscal (ventas)" value={formatBs(s.ivaDebito)} tone="warning" />
-              <Row
-                label="Crédito fiscal (compras)"
-                value={`− ${formatBs(s.ivaCredito)}`}
-                tone="success"
-              />
-              <Row label="Neto a pagar" value={formatBs(s.ivaAPagar)} bold />
+            <div className="flex gap-3 rounded-2xl bg-secondary p-4 text-sm text-foreground/70">
+              <Info className="mt-0.5 size-4 shrink-0 text-primary" />
+              <p>
+                En Bolivia <b>no existe una obligación de pagar impuestos diaria ni semanal</b>: el
+                IVA y el IT se calculan mes a mes, y el IUE una vez al año. Esta vista es solo para
+                que veas cómo te fue en el día o la semana. Cambia a{" "}
+                <button onClick={() => setPeriod("mes")} className="font-bold text-primary underline">
+                  Este mes
+                </button>{" "}
+                para ver tu cálculo tributario real.
+              </p>
             </div>
-            <p className="mt-4 text-xs text-foreground/50">Formulario 200 · Mensual</p>
+          </section>
+        ) : (
+          <>
+            {/* Estado de Resultados del período (punto 1: cadena completa con fechas) */}
+            <section className="animate-reveal [animation-delay:50ms] rounded-3xl bg-card p-6 ring-1 ring-black/5 sm:p-8">
+              <div className="mb-5 flex items-center justify-between">
+                <h2 className="font-serif text-2xl italic">Resultado del período</h2>
+                <ConceptPopover conceptKey="utilidad" />
+              </div>
+              <div className="divide-y divide-border text-sm">
+                <PnlLine label="Ingresos del período" value={pnl.ingresos} tone="in" />
+                <PnlLine label="(−) Gastos del período" value={-gastosTotal} tone="out" />
+                <PnlLine
+                  label="= Utilidad antes de impuestos"
+                  value={pnl.utilidadOperativa}
+                  tone="sub"
+                />
+                <PnlLine label="(−) Impuestos (IVA + IT)" value={-pnl.impuestos} tone="out" />
+              </div>
+              <div className="mt-4 rounded-2xl bg-secondary p-5">
+                <div className="flex items-baseline justify-between">
+                  <span className="font-bold">Utilidad después de impuestos</span>
+                  <span
+                    className={`font-serif text-3xl italic ${
+                      pnl.utilidadNeta >= 0 ? "text-success" : "text-danger"
+                    }`}
+                  >
+                    {formatBs(pnl.utilidadNeta)}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-foreground/50">
+                  Margen neto {(pnl.margenNeto * 100).toFixed(1)}% · el IUE anual se calcula aparte, en
+                  tu Cierre de Gestión (más abajo).
+                </p>
+              </div>
+            </section>
+
+            {/* Ahorro tributario destacado */}
+            {pnl.ivaCredito > 0 && (
+              <section className="animate-reveal [animation-delay:75ms] flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-success/10 p-6">
+                <div className="flex items-center gap-2">
+                  <p className="font-bold text-success">
+                    Ahorro tributario del período: {formatBs(pnl.ivaCredito)}
+                  </p>
+                  <ConceptPopover conceptKey="ahorro-tributario" />
+                </div>
+                <p className="max-w-md text-sm text-foreground/60">
+                  Es el IVA que dejaste de pagar por exigir factura en tus compras. Cada factura que
+                  pides es dinero que se queda contigo.
+                </p>
+              </section>
+            )}
+
+            {/* IVA / IT */}
+            <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="animate-reveal [animation-delay:100ms] rounded-3xl bg-card p-6 ring-1 ring-black/5">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
+                    IVA · 13%
+                  </span>
+                  <ConceptPopover conceptKey="iva" />
+                </div>
+                <p className="mb-1 text-xs uppercase text-foreground/50">A pagar en el período</p>
+                <p className="mb-4 font-serif text-4xl italic">{formatBs(pnl.ivaAPagar)}</p>
+                <div className="space-y-2 border-t border-border pt-4 text-sm">
+                  <Row label="Débito fiscal (ventas)" value={formatBs(pnl.ivaDebito)} tone="warning" />
+                  <Row
+                    label="Crédito fiscal (compras con factura)"
+                    value={`− ${formatBs(pnl.ivaCredito)}`}
+                    tone="success"
+                  />
+                  <Row label="Neto a pagar" value={formatBs(pnl.ivaAPagar)} bold />
+                </div>
+                <p className="mt-4 text-xs text-foreground/50">Formulario 200 · Mensual</p>
+              </div>
+
+              <div className="animate-reveal [animation-delay:150ms] rounded-3xl bg-card p-6 ring-1 ring-black/5">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="rounded-full bg-warning/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-warning-foreground">
+                    IT · 3%
+                  </span>
+                  <ConceptPopover conceptKey="it" />
+                </div>
+                <p className="mb-1 text-xs uppercase text-foreground/50">A pagar en el período</p>
+                <p className="mb-4 font-serif text-4xl italic">{formatBs(pnl.it)}</p>
+                <div className="space-y-2 border-t border-border pt-4 text-sm">
+                  <Row label="Ingresos brutos del período" value={formatBs(pnl.ingresos)} />
+                  <Row label={`× ${(IT_RATE * 100).toFixed(0)}%`} value={formatBs(pnl.it)} bold />
+                </div>
+                <p className="mt-4 text-xs text-foreground/50">Formulario 400 · Mensual</p>
+              </div>
+            </section>
+
+            {/* Proveedores */}
+            {providers.length > 0 && (
+              <section className="animate-reveal [animation-delay:175ms] rounded-3xl bg-card p-6 ring-1 ring-black/5 sm:p-8">
+                <div className="mb-5 flex items-center justify-between">
+                  <h2 className="font-serif text-2xl italic">Tus proveedores</h2>
+                  <span className="text-xs text-foreground/50">
+                    {providers.length} proveedor{providers.length === 1 ? "" : "es"}
+                  </span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[480px] text-sm">
+                    <thead>
+                      <tr className="border-b border-border text-left text-[10px] font-bold uppercase tracking-widest text-foreground/50">
+                        <th className="pb-2 pr-3">Proveedor</th>
+                        <th className="pb-2 pr-3 text-right">Compras</th>
+                        <th className="pb-2 pr-3 text-right">Facturas</th>
+                        <th className="pb-2 pr-3 text-right">Monto</th>
+                        <th className="pb-2 text-right">Crédito fiscal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {providers.map((p) => (
+                        <tr key={p.name} className="border-b border-border/60 last:border-0">
+                          <td className="py-2.5 pr-3 font-bold">{p.name}</td>
+                          <td className="py-2.5 pr-3 text-right">{p.compras}</td>
+                          <td className="py-2.5 pr-3 text-right">
+                            <span
+                              className={
+                                p.facturas === p.compras
+                                  ? "text-success"
+                                  : p.facturas === 0
+                                    ? "text-danger"
+                                    : "text-warning-foreground"
+                              }
+                            >
+                              {p.facturas}/{p.compras}
+                            </span>
+                          </td>
+                          <td className="py-2.5 pr-3 text-right font-mono">{formatBs(p.monto)}</td>
+                          <td className="py-2.5 text-right font-mono text-success">
+                            {p.creditoFiscal > 0 ? formatBs(p.creditoFiscal) : "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="mt-4 text-xs text-foreground/50">
+                  "Facturas" muestra cuántas de tus compras a ese proveedor tuvieron factura. Si un
+                  proveedor casi nunca te da factura, estás perdiendo crédito fiscal con él.
+                </p>
+              </section>
+            )}
+          </>
+        )}
+
+        {/* Cierre de Gestión (IUE real, no un año calendario fijo) */}
+        <section className="animate-reveal [animation-delay:180ms] rounded-3xl bg-card p-6 ring-1 ring-black/5 sm:p-8">
+          <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="font-serif text-2xl italic">Cierre de Gestión</h2>
+                <ConceptPopover conceptKey="cierre-gestion" />
+              </div>
+              <p className="mt-1 max-w-xl text-sm text-foreground/60">
+                Tu año contable real para el IUE. No siempre es de enero a diciembre: depende del
+                rubro de tu negocio.
+              </p>
+            </div>
+            <div>
+              <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-foreground/50">
+                Rubro de tu negocio
+              </label>
+              <select
+                value={sector}
+                onChange={(e) => changeSector(e.target.value as Sector)}
+                className="rounded-xl bg-secondary px-3 py-2.5 text-sm font-bold ring-1 ring-black/5 focus:outline-none focus:ring-primary/40"
+              >
+                {(Object.keys(SECTOR_INFO) as Sector[]).map((s) => (
+                  <option key={s} value={s}>
+                    {SECTOR_INFO[s].label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* IT */}
-          <div className="animate-reveal [animation-delay:100ms] rounded-3xl bg-card p-6 ring-1 ring-black/5">
-            <div className="mb-4 flex items-center justify-between">
-              <span className="rounded-full bg-warning/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-warning-foreground">
-                IT · 3%
-              </span>
-              <ConceptPopover conceptKey="it" />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl bg-secondary p-5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/50">
+                Tu gestión {gestionEnCurso ? "en curso" : ""}
+              </p>
+              <p className="mt-1 font-serif text-lg italic">
+                {fmtDate(gestion.start)} — {fmtDate(gestion.end)}
+              </p>
             </div>
-            <p className="mb-1 text-xs uppercase text-foreground/50">A pagar este mes</p>
-            <p className="mb-4 font-serif text-4xl italic">{formatBs(s.itAPagar)}</p>
-            <div className="space-y-2 border-t border-border pt-4 text-sm">
-              <Row label="Ingresos brutos del mes" value={formatBs(s.ingresos)} />
-              <Row label={`× ${(IT_RATE * 100).toFixed(0)}%`} value={formatBs(s.itAPagar)} bold />
+            <div className="rounded-2xl bg-secondary p-5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/50">
+                Utilidad de la gestión (a la fecha)
+              </p>
+              <p
+                className={`mt-1 font-serif text-lg italic ${
+                  gestionPnl.utilidadOperativa >= 0 ? "text-foreground" : "text-danger"
+                }`}
+              >
+                {formatBs(gestionPnl.utilidadOperativa)}
+              </p>
             </div>
-            <p className="mt-4 text-xs text-foreground/50">Formulario 400 · Mensual</p>
+            <div className="rounded-2xl bg-danger/10 p-5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-danger">
+                IUE estimado (25%)
+              </p>
+              <p className="mt-1 font-serif text-lg italic text-danger">{formatBs(iueGestion)}</p>
+            </div>
           </div>
-
-          {/* IUE */}
-          <div className="animate-reveal [animation-delay:150ms] rounded-3xl bg-card p-6 ring-1 ring-black/5">
-            <div className="mb-4 flex items-center justify-between">
-              <span className="rounded-full bg-danger/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-danger">
-                IUE · 25%
-              </span>
-              <ConceptPopover conceptKey="iue" />
-            </div>
-            <p className="mb-1 text-xs uppercase text-foreground/50">Estimado anual</p>
-            <p className="mb-4 font-serif text-4xl italic">{formatBs(iueEstimado)}</p>
-            <div className="space-y-2 border-t border-border pt-4 text-sm">
-              <Row
-                label="Utilidad anual proyectada"
-                value={formatBs(utilidadAnualEstimada)}
-              />
-              <Row
-                label={`× ${(IUE_RATE * 100).toFixed(0)}%`}
-                value={formatBs(iueEstimado)}
-                bold
-              />
-            </div>
-            <p className="mt-4 text-xs text-foreground/50">Formulario 500 · Anual (120 días)</p>
-          </div>
+          <p className="mt-4 text-xs text-foreground/50">
+            Vence el <b>{fmtDate(gestion.dueDate)}</b> (120 días después del cierre). Este cálculo usa
+            tus movimientos reales de la gestión en curso, no una proyección; si aún no terminó tu
+            gestión, el monto irá cambiando.
+          </p>
         </section>
 
         {/* Comparador de regímenes */}
-        <section className="animate-reveal [animation-delay:175ms] rounded-3xl bg-card p-8 ring-1 ring-black/5">
+        <section className="animate-reveal [animation-delay:200ms] rounded-3xl bg-card p-8 ring-1 ring-black/5">
           <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 className="font-serif text-2xl italic">¿Qué régimen te conviene?</h2>
@@ -180,7 +435,7 @@ function Impuestos() {
         </section>
 
         {/* Timeline */}
-        <section className="animate-reveal [animation-delay:200ms] rounded-3xl bg-card p-8 ring-1 ring-black/5">
+        <section className="animate-reveal [animation-delay:225ms] rounded-3xl bg-card p-8 ring-1 ring-black/5">
           <h2 className="mb-6 font-serif text-2xl italic">Calendario de vencimientos</h2>
           <div className="relative border-l-2 border-border pl-8">
             <TimelineItem
@@ -203,47 +458,33 @@ function Impuestos() {
             />
             <TimelineItem
               badge="Anual"
-              date="120 días tras cierre de gestión"
-              title="IUE — Impuesto sobre Utilidades"
-              body="Cierre contable y pago del 25% sobre utilidades netas. Se puede compensar con IT del año siguiente."
+              date={fmtDate(gestion.dueDate)}
+              title="IUE — Cierre de Gestión"
+              body={`Tu rubro (${SECTOR_INFO[sector].label}) cierra el ${fmtDate(gestion.end)}. Se puede compensar con IT del año siguiente.`}
               color="danger"
             />
           </div>
         </section>
-
-        <section className="animate-reveal [animation-delay:250ms] grid grid-cols-1 gap-4 rounded-3xl border-2 border-dashed border-border bg-secondary p-8 md:grid-cols-3">
-          <div>
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-primary">
-              Reserva sugerida
-            </p>
-            <p className="font-serif text-3xl italic">{formatBs(s.totalImpuestos)}</p>
-            <p className="mt-2 text-xs text-foreground/60">
-              Sepárala en una cuenta aparte para no gastarla.
-            </p>
-          </div>
-          <div>
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-primary">
-              Tasa efectiva del mes
-            </p>
-            <p className="font-serif text-3xl italic">
-              {s.ingresos > 0 ? ((s.totalImpuestos / s.ingresos) * 100).toFixed(1) : "0"}%
-            </p>
-            <p className="mt-2 text-xs text-foreground/60">
-              % de ingresos brutos destinados a impuestos.
-            </p>
-          </div>
-          <div>
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-primary">
-              Utilidad neta estimada
-            </p>
-            <p className="font-serif text-3xl italic">
-              {formatBs(s.utilidad - s.totalImpuestos)}
-            </p>
-            <p className="mt-2 text-xs text-foreground/60">Después de cubrir impuestos.</p>
-          </div>
-        </section>
       </main>
     </AppShell>
+  );
+}
+
+function PnlLine({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "in" | "out" | "sub";
+}) {
+  const color = tone === "in" ? "text-success" : tone === "out" ? "text-danger" : "text-foreground";
+  return (
+    <div className={`flex items-baseline justify-between py-2.5 ${tone === "sub" ? "font-bold" : ""}`}>
+      <span className={tone === "sub" ? "" : "text-foreground/70"}>{label}</span>
+      <span className={`font-mono tabular-nums ${color}`}>{formatBs(value)}</span>
+    </div>
   );
 }
 
@@ -366,6 +607,3 @@ function RegimeCard({ o }: { o: RegimeOption }) {
     </div>
   );
 }
-
-// Suppress unused warnings on constants imported for reference clarity
-void IVA_RATE;

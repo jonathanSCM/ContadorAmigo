@@ -109,7 +109,7 @@ ${row("(−) IVA e IT estimados", "− " + formatBs(pnl.impuestos), { color: "#a
 
   return (
     <AppShell>
-      <main className="mx-auto max-w-7xl space-y-8 p-6">
+      <main className="mx-auto max-w-7xl space-y-8 p-4 sm:p-6">
         <header className="animate-reveal flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-serif text-4xl italic">Análisis del negocio</h1>

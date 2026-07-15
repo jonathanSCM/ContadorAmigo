@@ -1,10 +1,14 @@
 // Gestión de múltiples negocios (perfiles). Cada negocio guarda sus datos
 // (movimientos, NIT, productos, metas) en un espacio de claves separado.
 
+import type { Sector } from "./sectors";
+import { DEFAULT_SECTOR } from "./sectors";
+
 export interface Business {
   id: string;
   name: string;
   createdAt: string;
+  sector?: Sector;
 }
 
 interface Registry {
@@ -146,6 +150,20 @@ export function renameBusiness(id: string, name: string): void {
     b.name = name.trim();
     writeReg(r);
   }
+}
+
+/** Rubro económico del negocio (define su fecha real de cierre de gestión). */
+export function setSector(id: string, sector: Sector): void {
+  const r = ensureInit();
+  const b = r.list.find((x) => x.id === id);
+  if (b) {
+    b.sector = sector;
+    writeReg(r);
+  }
+}
+
+export function activeSector(): Sector {
+  return activeBusiness()?.sector ?? DEFAULT_SECTOR;
 }
 
 export function deleteBusiness(id: string): void {

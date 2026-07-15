@@ -2,7 +2,10 @@
 import type { Movement } from "./storage";
 import { IT_RATE, IVA_RATE } from "./tax";
 
-export type Period = "mes" | "anio" | "todo";
+// "dia" y "semana" son resúmenes de caja INFORMATIVOS: en Bolivia no existe
+// obligación tributaria diaria ni semanal (IVA/IT son mensuales, IUE anual),
+// así que estos periodos nunca deben mostrarse como "impuesto a pagar".
+export type Period = "dia" | "semana" | "mes" | "anio" | "todo";
 
 /** Monto bruto (con IVA si tiene factura), consistente con balance(). */
 export const gross = (m: Movement) =>
@@ -10,16 +13,73 @@ export const gross = (m: Movement) =>
 
 const COSTO_VENTAS_CATS = new Set(["Insumos"]);
 
+function startOfDay(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+function endOfDay(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+}
+/** Lunes de la semana de `d` (semana calendario, lunes a domingo). */
+function startOfWeek(d: Date): Date {
+  const day = d.getDay(); // 0=domingo
+  const diff = day === 0 ? -6 : 1 - day;
+  const s = new Date(d);
+  s.setDate(d.getDate() + diff);
+  return startOfDay(s);
+}
+function endOfWeek(d: Date): Date {
+  const s = startOfWeek(d);
+  const e = new Date(s);
+  e.setDate(s.getDate() + 6);
+  return endOfDay(e);
+}
+
+/** Rango [inicio, fin] correspondiente a un período, para mostrar fechas claras. */
+export function periodRange(
+  movs: Movement[],
+  period: Period,
+  ref = new Date(),
+): { start: Date; end: Date } {
+  switch (period) {
+    case "dia":
+      return { start: startOfDay(ref), end: endOfDay(ref) };
+    case "semana":
+      return { start: startOfWeek(ref), end: endOfWeek(ref) };
+    case "mes":
+      return {
+        start: new Date(ref.getFullYear(), ref.getMonth(), 1),
+        end: new Date(ref.getFullYear(), ref.getMonth() + 1, 0, 23, 59, 59, 999),
+      };
+    case "anio":
+      return {
+        start: new Date(ref.getFullYear(), 0, 1),
+        end: new Date(ref.getFullYear(), 11, 31, 23, 59, 59, 999),
+      };
+    case "todo": {
+      if (movs.length === 0) return { start: ref, end: ref };
+      const dates = movs.map((m) => new Date(m.date).getTime());
+      return { start: new Date(Math.min(...dates)), end: new Date(Math.max(...dates)) };
+    }
+  }
+}
+
 export function filterByPeriod(
   movs: Movement[],
   period: Period,
   ref = new Date(),
 ): Movement[] {
   if (period === "todo") return movs;
+  const { start, end } = periodRange(movs, period, ref);
   return movs.filter((m) => {
     const d = new Date(m.date);
-    if (period === "anio") return d.getFullYear() === ref.getFullYear();
-    return d.getMonth() === ref.getMonth() && d.getFullYear() === ref.getFullYear();
+    return d >= start && d <= end;
+  });
+}
+
+function filterByRange(movs: Movement[], start: Date, end: Date): Movement[] {
+  return movs.filter((m) => {
+    const d = new Date(m.date);
+    return d >= start && d <= end;
   });
 }
 
@@ -36,6 +96,8 @@ export interface PnL {
   gastosOperativos: number;
   operativos: OperativoRow[];
   utilidadOperativa: number;
+  ivaDebito: number;
+  ivaCredito: number;
   ivaAPagar: number;
   it: number;
   impuestos: number;
@@ -48,8 +110,15 @@ export function profitAndLoss(
   period: Period,
   ref = new Date(),
 ): PnL {
-  const inPeriod = filterByPeriod(movs, period, ref);
+  return pnlCore(filterByPeriod(movs, period, ref));
+}
 
+/** Estado de Resultados sobre un rango de fechas explícito (p. ej. una gestión fiscal). */
+export function profitAndLossRange(movs: Movement[], start: Date, end: Date): PnL {
+  return pnlCore(filterByRange(movs, start, end));
+}
+
+function pnlCore(inPeriod: Movement[]): PnL {
   let ingresos = 0;
   let costoVentas = 0;
   let ivaDebito = 0;
@@ -92,6 +161,8 @@ export function profitAndLoss(
     gastosOperativos,
     operativos,
     utilidadOperativa,
+    ivaDebito,
+    ivaCredito,
     ivaAPagar,
     it,
     impuestos,
@@ -200,4 +271,31 @@ export function monthlyFixedCosts(movs: Movement[], months = 3, ref = new Date()
   }
   const n = Math.max(1, monthsSeen.size);
   return total / n;
+}
+
+export interface ProviderRow {
+  name: string;
+  compras: number; // total de compras (con y sin factura)
+  facturas: number; // cuántas de esas compras tienen factura
+  monto: number; // monto total gastado (bruto)
+  creditoFiscal: number; // IVA crédito fiscal generado por ese proveedor
+}
+
+/** Agrupa los gastos por proveedor: cuántas compras, cuántas con factura y el monto. */
+export function providerSummary(movs: Movement[], period: Period, ref = new Date()): ProviderRow[] {
+  const inPeriod = filterByPeriod(movs, period, ref);
+  const map = new Map<string, ProviderRow>();
+  for (const m of inPeriod) {
+    if (m.type !== "gasto" || !m.providerName?.trim()) continue;
+    const key = m.providerName.trim();
+    const row = map.get(key) ?? { name: key, compras: 0, facturas: 0, monto: 0, creditoFiscal: 0 };
+    row.compras += 1;
+    row.monto += gross(m);
+    if (m.hasInvoice) {
+      row.facturas += 1;
+      row.creditoFiscal += m.amountNet * IVA_RATE;
+    }
+    map.set(key, row);
+  }
+  return [...map.values()].sort((a, b) => b.monto - a.monto);
 }

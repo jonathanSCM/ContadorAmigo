@@ -47,7 +47,7 @@ function Facturacion() {
 
   return (
     <AppShell>
-      <main className="mx-auto grid max-w-7xl grid-cols-12 gap-8 p-6">
+      <main className="mx-auto grid max-w-7xl grid-cols-12 gap-4 p-4 sm:gap-8 sm:p-6">
         <section className="col-span-12 lg:col-span-8 animate-reveal">
           <header className="mb-6">
             <h1 className="font-serif text-4xl italic">Simulador de Factura</h1>
@@ -83,7 +83,7 @@ function Facturacion() {
               </div>
             </div>
 
-            <div className="mb-3 grid grid-cols-12 gap-2 border-b border-border pb-2 text-[10px] font-bold uppercase tracking-widest text-foreground/50">
+            <div className="mb-3 hidden gap-2 border-b border-border pb-2 text-[10px] font-bold uppercase tracking-widest text-foreground/50 sm:grid sm:grid-cols-12">
               <div className="col-span-6">Detalle</div>
               <div className="col-span-2 text-right">Cant.</div>
               <div className="col-span-3 text-right">P. Unit. (Bs)</div>
@@ -92,11 +92,15 @@ function Facturacion() {
 
             <div className="space-y-2">
               {lines.map((l) => (
-                <div key={l.id} className="grid grid-cols-12 items-center gap-2">
+                <div
+                  key={l.id}
+                  className="grid grid-cols-2 items-center gap-2 sm:grid-cols-12"
+                >
                   <input
                     value={l.detail}
                     onChange={(e) => update(l.id, { detail: e.target.value })}
-                    className="col-span-6 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
+                    placeholder="Detalle del producto o servicio"
+                    className="col-span-2 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none sm:col-span-6"
                   />
                   <input
                     inputMode="numeric"
@@ -104,7 +108,8 @@ function Facturacion() {
                     min={0}
                     value={l.qty}
                     onChange={(e) => update(l.id, { qty: parseFloat(e.target.value) || 0 })}
-                    className="col-span-2 rounded-lg border border-border bg-background px-3 py-2 text-right text-sm focus:border-primary focus:outline-none"
+                    placeholder="Cant."
+                    className="col-span-1 rounded-lg border border-border bg-background px-3 py-2 text-right text-sm focus:border-primary focus:outline-none sm:col-span-2"
                   />
                   <input
                     inputMode="decimal"
@@ -112,11 +117,12 @@ function Facturacion() {
                     min={0}
                     value={l.price}
                     onChange={(e) => update(l.id, { price: parseFloat(e.target.value) || 0 })}
-                    className="col-span-3 rounded-lg border border-border bg-background px-3 py-2 text-right text-sm font-bold focus:border-primary focus:outline-none"
+                    placeholder="P. Unit."
+                    className="col-span-1 rounded-lg border border-border bg-background px-3 py-2 text-right text-sm font-bold focus:border-primary focus:outline-none sm:col-span-3"
                   />
                   <button
                     onClick={() => removeLine(l.id)}
-                    className="col-span-1 grid place-items-center rounded-lg p-2 text-foreground/30 hover:bg-danger/10 hover:text-danger"
+                    className="col-span-2 grid place-items-center rounded-lg border border-dashed border-border p-2 text-foreground/30 hover:bg-danger/10 hover:text-danger sm:col-span-1 sm:border-none"
                     aria-label="Quitar línea"
                   >
                     <Trash2 className="size-4" />

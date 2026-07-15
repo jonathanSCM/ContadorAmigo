@@ -37,6 +37,9 @@ function Movimientos() {
   const [hasInvoice, setHasInvoice] = useState(true);
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [date, setDate] = useState(today());
+  const [providerName, setProviderName] = useState("");
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [providerNit, setProviderNit] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const [filter, setFilter] = useState<"todos" | MovementType>("todos");
@@ -55,6 +58,9 @@ function Movimientos() {
     setHasInvoice(true);
     setCategory(CATEGORIES[0]);
     setDate(today());
+    setProviderName("");
+    setInvoiceNumber("");
+    setProviderNit("");
   };
 
   const submit = (e: React.FormEvent) => {
@@ -65,11 +71,28 @@ function Movimientos() {
       return;
     }
     const iso = new Date(`${date}T12:00:00`).toISOString();
+    const providerFields =
+      type === "gasto"
+        ? {
+            providerName: providerName.trim() || undefined,
+            invoiceNumber: hasInvoice ? invoiceNumber.trim() || undefined : undefined,
+            providerNit: hasInvoice ? providerNit.trim() || undefined : undefined,
+          }
+        : { providerName: undefined, invoiceNumber: undefined, providerNit: undefined };
     let next: Movement[];
     if (editingId) {
       next = movs.map((m) =>
         m.id === editingId
-          ? { ...m, type, concept: concept.trim(), amountNet: amt, hasInvoice, category, date: iso }
+          ? {
+              ...m,
+              type,
+              concept: concept.trim(),
+              amountNet: amt,
+              hasInvoice,
+              category,
+              date: iso,
+              ...providerFields,
+            }
           : m,
       );
       toast.success("Movimiento actualizado");
@@ -82,6 +105,7 @@ function Movimientos() {
         hasInvoice,
         category,
         date: iso,
+        ...providerFields,
       };
       next = [m, ...movs];
       toast.success(`${type === "ingreso" ? "Ingreso" : "Gasto"} registrado`);
@@ -99,6 +123,9 @@ function Movimientos() {
     setHasInvoice(m.hasInvoice);
     setCategory(m.category);
     setDate(m.date.slice(0, 10));
+    setProviderName(m.providerName ?? "");
+    setInvoiceNumber(m.invoiceNumber ?? "");
+    setProviderNit(m.providerNit ?? "");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -168,7 +195,7 @@ function Movimientos() {
 
   return (
     <AppShell>
-      <main className="mx-auto grid max-w-7xl grid-cols-12 gap-8 p-6">
+      <main className="mx-auto grid max-w-7xl grid-cols-12 gap-4 p-4 sm:gap-8 sm:p-6">
         {/* Form */}
         <section className="col-span-12 lg:col-span-5 animate-reveal">
           <div className="rounded-3xl bg-primary p-6 text-primary-foreground">
@@ -267,6 +294,20 @@ function Movimientos() {
                 </select>
               </div>
 
+              {type === "gasto" && (
+                <div>
+                  <label className="mb-2 block text-[10px] font-bold uppercase opacity-70">
+                    Proveedor <span className="normal-case opacity-60">(opcional)</span>
+                  </label>
+                  <input
+                    value={providerName}
+                    onChange={(e) => setProviderName(e.target.value)}
+                    placeholder="Ej: Distribuidora La Cruceña"
+                    className="w-full rounded-lg bg-white/10 px-4 py-3 text-sm font-medium ring-1 ring-white/20 placeholder:text-primary-foreground/40 focus:outline-none focus:ring-white/50"
+                  />
+                </div>
+              )}
+
               <label className="flex cursor-pointer items-start gap-3 rounded-lg bg-white/5 p-3 ring-1 ring-white/10">
                 <input
                   type="checkbox"
@@ -279,10 +320,37 @@ function Movimientos() {
                   <p className="text-xs opacity-70">
                     {type === "ingreso"
                       ? "Genera débito fiscal a pagar al SIN."
-                      : "Genera crédito fiscal a tu favor."}
+                      : "Genera crédito fiscal a tu favor: reduce el IVA que pagas."}
                   </p>
                 </div>
               </label>
+
+              {type === "gasto" && hasInvoice && (
+                <div className="grid grid-cols-2 gap-3 rounded-lg bg-white/5 p-3 ring-1 ring-white/10">
+                  <div>
+                    <label className="mb-2 block text-[10px] font-bold uppercase opacity-70">
+                      N° de factura
+                    </label>
+                    <input
+                      value={invoiceNumber}
+                      onChange={(e) => setInvoiceNumber(e.target.value)}
+                      placeholder="Ej: 1024"
+                      className="w-full rounded-lg bg-white/10 px-3 py-2.5 text-sm font-medium ring-1 ring-white/20 placeholder:text-primary-foreground/40 focus:outline-none focus:ring-white/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-[10px] font-bold uppercase opacity-70">
+                      NIT proveedor
+                    </label>
+                    <input
+                      value={providerNit}
+                      onChange={(e) => setProviderNit(e.target.value)}
+                      placeholder="Ej: 1023845017"
+                      className="w-full rounded-lg bg-white/10 px-3 py-2.5 text-sm font-medium ring-1 ring-white/20 placeholder:text-primary-foreground/40 focus:outline-none focus:ring-white/50"
+                    />
+                  </div>
+                </div>
+              )}
 
               {amt > 0 && (
                 <div className="rounded-lg bg-white/10 p-3 text-xs">
@@ -400,7 +468,8 @@ function Movimientos() {
                           year: "numeric",
                         })}{" "}
                         · {m.category}
-                        {m.hasInvoice && " · Con factura"}
+                        {m.providerName && ` · ${m.providerName}`}
+                        {m.hasInvoice && (m.invoiceNumber ? ` · Factura N° ${m.invoiceNumber}` : " · Con factura")}
                       </p>
                     </div>
                   </div>

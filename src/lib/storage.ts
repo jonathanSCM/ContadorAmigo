@@ -12,6 +12,12 @@ export interface Movement {
   category: string;
   date: string; // ISO date
   note?: string;
+  // Datos del proveedor (solo relevantes en gastos). providerName se puede
+  // llenar aunque no haya factura (para llevar el registro de con quién se
+  // compra); invoiceNumber y providerNit solo tienen sentido con factura.
+  providerName?: string;
+  invoiceNumber?: string;
+  providerNit?: string;
 }
 
 import { bizKey } from "./profiles";
@@ -115,6 +121,7 @@ function buildDemo(): Movement[] {
     amountNet: number,
     hasInvoice: boolean,
     category: string,
+    provider?: { name: string; invoiceNumber?: string; nit?: string },
   ) => {
     if (amountNet <= 0) return;
     // En el mes actual solo registramos hasta el día de hoy (mes en curso).
@@ -127,6 +134,9 @@ function buildDemo(): Movement[] {
       hasInvoice,
       category,
       date: at(monthsAgo, day),
+      providerName: provider?.name,
+      invoiceNumber: hasInvoice ? provider?.invoiceNumber : undefined,
+      providerNit: hasInvoice ? provider?.nit : undefined,
     });
   };
 
@@ -162,19 +172,43 @@ function buildDemo(): Movement[] {
     add(m, 27, "ingreso", "Venta mostrador — cierre de mes", 560 * s, false, "Ventas");
 
     // --- GASTOS ---
-    // Insumos (costo de ventas) — con factura (crédito fiscal)
-    add(m, 2, "gasto", "Insumos — harina, huevos, azúcar", 700 * s, true, "Insumos");
-    add(m, 11, "gasto", "Insumos — chocolate, frutas, lácteos", 560 * s, true, "Insumos");
-    add(m, 18, "gasto", "Empaques y descartables", 480 * s, true, "Insumos");
+    // Insumos (costo de ventas) — proveedor habitual, no siempre factura
+    add(m, 2, "gasto", "Insumos — harina, huevos, azúcar", 700 * s, true, "Insumos", {
+      name: "Distribuidora La Cruceña",
+      invoiceNumber: `F-${1000 + m * 3}`,
+      nit: "1023845017",
+    });
+    add(m, 11, "gasto", "Insumos — chocolate, frutas, lácteos", 560 * s, m % 3 !== 0, "Insumos", {
+      name: "Distribuidora La Cruceña",
+      invoiceNumber: m % 3 !== 0 ? `F-${1001 + m * 3}` : undefined,
+      nit: "1023845017",
+    });
+    add(m, 18, "gasto", "Empaques y descartables", 480 * s, true, "Insumos", {
+      name: "Empaques del Oriente",
+      invoiceNumber: `F-${2200 + m * 2}`,
+      nit: "5091827364",
+    });
     // Costos fijos
-    add(m, 3, "gasto", "Alquiler del local", 900, false, "Fijos");
-    add(m, 5, "gasto", "Luz, agua e internet", 290, true, "Fijos");
+    add(m, 3, "gasto", "Alquiler del local", 900, false, "Fijos", { name: "Propietario del local" });
+    add(m, 5, "gasto", "Luz, agua e internet", 290, true, "Fijos", {
+      name: "CRE / SAGUAPAC",
+      invoiceNumber: `E-${88000 + m}`,
+      nit: "1000000019",
+    });
     add(m, 10, "gasto", "Sueldo ayudante de cocina", 1600, false, "Salarios");
     // Variables ocasionales
-    add(m, 8, "gasto", "Publicidad en redes sociales", 260, true, "Marketing");
-    add(m, 12, "gasto", "Transporte y delivery", 150, false, "Otros");
+    add(m, 8, "gasto", "Publicidad en redes sociales", 260, true, "Marketing", {
+      name: "Estudio Creativo Andino",
+      invoiceNumber: `F-${340 + m}`,
+      nit: "7261548930",
+    });
+    add(m, 12, "gasto", "Transporte y delivery", 150, false, "Otros", { name: "Mototaxi local" });
     if (m === 2) {
-      add(m, 19, "gasto", "Mantenimiento de horno", 450, true, "Otros");
+      add(m, 19, "gasto", "Mantenimiento de horno", 450, true, "Otros", {
+        name: "Servitécnica Industrial",
+        invoiceNumber: "F-9042",
+        nit: "3345678012",
+      });
     }
   }
 

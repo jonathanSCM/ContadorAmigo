@@ -78,11 +78,11 @@ export function BusinessSwitcher() {
           setOpen((o) => !o);
           setMode("list");
         }}
-        className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-bold transition-colors hover:border-primary/40"
+        className="flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1.5 text-xs font-bold transition-colors hover:border-primary/40 sm:gap-2 sm:px-3 sm:text-sm"
       >
-        <Building2 className="size-4 text-primary" />
-        <span className="max-w-[140px] truncate">{active?.name ?? "Mi negocio"}</span>
-        <ChevronDown className={`size-3.5 opacity-50 transition-transform ${open ? "rotate-180" : ""}`} />
+        <Building2 className="size-4 shrink-0 text-primary" />
+        <span className="max-w-[68px] truncate sm:max-w-[140px]">{active?.name ?? "Mi negocio"}</span>
+        <ChevronDown className={`size-3.5 shrink-0 opacity-50 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open && (

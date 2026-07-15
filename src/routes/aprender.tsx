@@ -27,7 +27,7 @@ function Aprender() {
 
   return (
     <AppShell>
-      <main className="mx-auto max-w-5xl p-6">
+      <main className="mx-auto max-w-5xl p-4 sm:p-6">
         <header className="mb-8 animate-reveal">
           <h1 className="font-serif text-4xl italic">Aprender contabilidad</h1>
           <p className="mt-2 max-w-2xl text-foreground/60">

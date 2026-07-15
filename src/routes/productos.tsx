@@ -103,7 +103,7 @@ function Productos() {
 
   return (
     <AppShell>
-      <main className="mx-auto max-w-7xl space-y-8 p-6">
+      <main className="mx-auto max-w-7xl space-y-8 p-4 sm:p-6">
         <header className="animate-reveal">
           <h1 className="font-serif text-4xl italic">Productos y precios</h1>
           <p className="mt-2 max-w-2xl text-foreground/60">

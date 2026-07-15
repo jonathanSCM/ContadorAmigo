@@ -4,6 +4,9 @@ import { AppShell } from "@/components/AppShell";
 import { ConceptPopover } from "@/components/ConceptPopover";
 import { loadMovements, loadNit, type Movement } from "@/lib/storage";
 import { balance, calcMonthly, formatBs, healthStatus, nextTaxDue, IVA_RATE } from "@/lib/tax";
+import { profitAndLoss, type PnL } from "@/lib/analysis";
+import { activeSector } from "@/lib/profiles";
+import { gestionRange, SECTOR_INFO } from "@/lib/sectors";
 import { CONCEPTS } from "@/lib/concepts";
 
 export const Route = createFileRoute("/")({
@@ -44,6 +47,9 @@ function Index() {
   const concept = CONCEPTS[conceptIdx];
 
   const weekly = useMemo(() => buildWeekly(movs), [movs]);
+  const pnlMonth = useMemo(() => profitAndLoss(movs, "mes"), [movs]);
+  const sector = useMemo(() => activeSector(), [movs]);
+  const gestion = useMemo(() => gestionRange(sector), [sector]);
 
   const healthBars = {
     verde: [true, false, false],
@@ -53,16 +59,16 @@ function Index() {
 
   return (
     <AppShell>
-      <main className="mx-auto grid max-w-7xl grid-cols-12 gap-8 p-6">
-        <div className="col-span-12 space-y-8 lg:col-span-8">
+      <main className="mx-auto grid max-w-7xl grid-cols-12 gap-4 p-4 sm:gap-8 sm:p-6">
+        <div className="col-span-12 space-y-6 sm:space-y-8 lg:col-span-8">
           {/* Hero */}
           <section className="animate-reveal">
-            <div className="flex flex-col items-end justify-between gap-6 rounded-3xl bg-card p-8 ring-1 ring-black/5 md:flex-row">
+            <div className="flex flex-col items-start justify-between gap-6 rounded-3xl bg-card p-5 ring-1 ring-black/5 sm:p-8 md:flex-row md:items-end">
               <div>
                 <p className="mb-1 text-sm font-medium uppercase tracking-wider text-foreground/50">
                   Saldo Disponible
                 </p>
-                <h1 className="text-5xl font-extrabold tracking-tighter">
+                <h1 className="text-4xl font-extrabold tracking-tighter sm:text-5xl">
                   {formatBs(bal).split(",")[0]}
                   <span className="text-foreground/30">
                     ,{formatBs(bal).split(",")[1] ?? "00"}
@@ -70,7 +76,7 @@ function Index() {
                 </h1>
                 <p className="mt-2 text-sm text-foreground/60">{health.description}</p>
               </div>
-              <div className="flex flex-col items-end">
+              <div className="flex flex-col items-start md:items-end">
                 <span className="mb-2 font-serif text-xs italic text-primary">
                   Próximo vencimiento: {due.day} de cada mes
                 </span>
@@ -129,6 +135,9 @@ function Index() {
               />
             </section>
           </div>
+
+          {/* Desglose: en qué se va cada Bs que vendes */}
+          <BreakdownCard pnl={pnlMonth} />
 
           {/* Chart */}
           <section className="animate-reveal [animation-delay:200ms] rounded-3xl bg-card p-6 ring-1 ring-black/5">
@@ -265,10 +274,13 @@ function Index() {
               <div className="relative border-l-2 border-primary/10 pl-4 opacity-60">
                 <div className="absolute -left-[5px] top-1 size-2 rounded-full bg-stone-300" />
                 <p className="text-xs font-bold uppercase text-foreground/40">
-                  Abr — 120 días tras cierre
+                  {gestion.dueDate.toLocaleDateString("es-BO", { day: "numeric", month: "long" })}
                 </p>
-                <p className="text-sm font-bold">IUE anual</p>
-                <p className="text-xs text-foreground/60">Sobre utilidades netas de la gestión</p>
+                <p className="text-sm font-bold">IUE — Cierre de Gestión</p>
+                <p className="text-xs text-foreground/60">
+                  {SECTOR_INFO[sector].label} · cierra el{" "}
+                  {gestion.end.toLocaleDateString("es-BO", { day: "numeric", month: "long" })}
+                </p>
               </div>
             </div>
           </section>
@@ -357,6 +369,75 @@ function Kpi({
         {deltaEl}
       </div>
     </div>
+  );
+}
+
+function BreakdownCard({ pnl }: { pnl: PnL }) {
+  const total = pnl.ingresos;
+  const segments = [
+    { label: "Costo de ventas", hint: "insumos y mercadería", value: pnl.costoVentas, color: "bg-warning" },
+    { label: "Gastos operativos", hint: "alquiler, sueldos, marketing…", value: pnl.gastosOperativos, color: "bg-danger" },
+    { label: "Impuestos", hint: "IVA + IT del mes", value: pnl.impuestos, color: "bg-primary" },
+    { label: "Utilidad neta", hint: "lo que te queda", value: Math.max(0, pnl.utilidadNeta), color: "bg-success" },
+  ];
+
+  if (total <= 0) {
+    return (
+      <section className="animate-reveal [animation-delay:150ms] rounded-3xl bg-card p-6 ring-1 ring-black/5">
+        <h3 className="mb-1 font-bold">¿En qué se va cada Bs que vendes?</h3>
+        <p className="text-sm text-foreground/50">
+          Registra ventas este mes para ver aquí cómo se reparte tu dinero.
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="animate-reveal [animation-delay:150ms] rounded-3xl bg-card p-6 ring-1 ring-black/5">
+      <div className="mb-1 flex items-center gap-2">
+        <h3 className="font-bold">¿En qué se va cada Bs que vendes?</h3>
+        <ConceptPopover conceptKey="utilidad" />
+      </div>
+      <p className="mb-6 text-sm text-foreground/50">
+        De cada Bs 100 que vendiste este mes, así se reparte entre costos, gastos, impuestos y tu
+        ganancia.
+      </p>
+
+      {/* Barra apilada */}
+      <div className="flex h-4 w-full overflow-hidden rounded-full bg-secondary">
+        {segments.map((s) => {
+          const pct = (s.value / total) * 100;
+          if (pct <= 0) return null;
+          return (
+            <div
+              key={s.label}
+              className={`h-full ${s.color} first:rounded-l-full last:rounded-r-full`}
+              style={{ width: `${pct}%` }}
+              title={`${s.label}: ${formatBs(s.value)} (${pct.toFixed(0)}%)`}
+            />
+          );
+        })}
+      </div>
+
+      {/* Leyenda */}
+      <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {segments.map((s) => {
+          const pct = total > 0 ? (s.value / total) * 100 : 0;
+          return (
+            <div key={s.label}>
+              <div className="flex items-center gap-1.5">
+                <span className={`size-2 rounded-full ${s.color}`} />
+                <span className="text-xs font-bold text-foreground/70">{s.label}</span>
+              </div>
+              <p className="mt-1 font-serif text-lg italic">{pct.toFixed(0)}%</p>
+              <p className="text-[11px] text-foreground/40">
+                {formatBs(s.value)} · {s.hint}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
