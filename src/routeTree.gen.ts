@@ -9,42 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ProductosRouteImport } from './routes/productos'
-import { Route as MovimientosRouteImport } from './routes/movimientos'
-import { Route as ImpuestosRouteImport } from './routes/impuestos'
-import { Route as FacturacionRouteImport } from './routes/facturacion'
-import { Route as AprenderRouteImport } from './routes/aprender'
-import { Route as AnalisisRouteImport } from './routes/analisis'
+import { Route as RegistroRouteImport } from './routes/registro'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NegocioBusinessIdRouteImport } from './routes/negocio.$businessId'
+import { Route as NegocioBusinessIdIndexRouteImport } from './routes/negocio.$businessId.index'
+import { Route as NegocioBusinessIdProductosRouteImport } from './routes/negocio.$businessId.productos'
+import { Route as NegocioBusinessIdMovimientosRouteImport } from './routes/negocio.$businessId.movimientos'
+import { Route as NegocioBusinessIdImpuestosRouteImport } from './routes/negocio.$businessId.impuestos'
+import { Route as NegocioBusinessIdFacturacionRouteImport } from './routes/negocio.$businessId.facturacion'
+import { Route as NegocioBusinessIdAprenderRouteImport } from './routes/negocio.$businessId.aprender'
+import { Route as NegocioBusinessIdAnalisisRouteImport } from './routes/negocio.$businessId.analisis'
 
-const ProductosRoute = ProductosRouteImport.update({
-  id: '/productos',
-  path: '/productos',
+const RegistroRoute = RegistroRouteImport.update({
+  id: '/registro',
+  path: '/registro',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MovimientosRoute = MovimientosRouteImport.update({
-  id: '/movimientos',
-  path: '/movimientos',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ImpuestosRoute = ImpuestosRouteImport.update({
-  id: '/impuestos',
-  path: '/impuestos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FacturacionRoute = FacturacionRouteImport.update({
-  id: '/facturacion',
-  path: '/facturacion',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AprenderRoute = AprenderRouteImport.update({
-  id: '/aprender',
-  path: '/aprender',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnalisisRoute = AnalisisRouteImport.update({
-  id: '/analisis',
-  path: '/analisis',
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -52,117 +42,168 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NegocioBusinessIdRoute = NegocioBusinessIdRouteImport.update({
+  id: '/negocio/$businessId',
+  path: '/negocio/$businessId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NegocioBusinessIdIndexRoute = NegocioBusinessIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NegocioBusinessIdRoute,
+} as any)
+const NegocioBusinessIdProductosRoute =
+  NegocioBusinessIdProductosRouteImport.update({
+    id: '/productos',
+    path: '/productos',
+    getParentRoute: () => NegocioBusinessIdRoute,
+  } as any)
+const NegocioBusinessIdMovimientosRoute =
+  NegocioBusinessIdMovimientosRouteImport.update({
+    id: '/movimientos',
+    path: '/movimientos',
+    getParentRoute: () => NegocioBusinessIdRoute,
+  } as any)
+const NegocioBusinessIdImpuestosRoute =
+  NegocioBusinessIdImpuestosRouteImport.update({
+    id: '/impuestos',
+    path: '/impuestos',
+    getParentRoute: () => NegocioBusinessIdRoute,
+  } as any)
+const NegocioBusinessIdFacturacionRoute =
+  NegocioBusinessIdFacturacionRouteImport.update({
+    id: '/facturacion',
+    path: '/facturacion',
+    getParentRoute: () => NegocioBusinessIdRoute,
+  } as any)
+const NegocioBusinessIdAprenderRoute =
+  NegocioBusinessIdAprenderRouteImport.update({
+    id: '/aprender',
+    path: '/aprender',
+    getParentRoute: () => NegocioBusinessIdRoute,
+  } as any)
+const NegocioBusinessIdAnalisisRoute =
+  NegocioBusinessIdAnalisisRouteImport.update({
+    id: '/analisis',
+    path: '/analisis',
+    getParentRoute: () => NegocioBusinessIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/analisis': typeof AnalisisRoute
-  '/aprender': typeof AprenderRoute
-  '/facturacion': typeof FacturacionRoute
-  '/impuestos': typeof ImpuestosRoute
-  '/movimientos': typeof MovimientosRoute
-  '/productos': typeof ProductosRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
+  '/registro': typeof RegistroRoute
+  '/negocio/$businessId': typeof NegocioBusinessIdRouteWithChildren
+  '/negocio/$businessId/analisis': typeof NegocioBusinessIdAnalisisRoute
+  '/negocio/$businessId/aprender': typeof NegocioBusinessIdAprenderRoute
+  '/negocio/$businessId/facturacion': typeof NegocioBusinessIdFacturacionRoute
+  '/negocio/$businessId/impuestos': typeof NegocioBusinessIdImpuestosRoute
+  '/negocio/$businessId/movimientos': typeof NegocioBusinessIdMovimientosRoute
+  '/negocio/$businessId/productos': typeof NegocioBusinessIdProductosRoute
+  '/negocio/$businessId/': typeof NegocioBusinessIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/analisis': typeof AnalisisRoute
-  '/aprender': typeof AprenderRoute
-  '/facturacion': typeof FacturacionRoute
-  '/impuestos': typeof ImpuestosRoute
-  '/movimientos': typeof MovimientosRoute
-  '/productos': typeof ProductosRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
+  '/registro': typeof RegistroRoute
+  '/negocio/$businessId/analisis': typeof NegocioBusinessIdAnalisisRoute
+  '/negocio/$businessId/aprender': typeof NegocioBusinessIdAprenderRoute
+  '/negocio/$businessId/facturacion': typeof NegocioBusinessIdFacturacionRoute
+  '/negocio/$businessId/impuestos': typeof NegocioBusinessIdImpuestosRoute
+  '/negocio/$businessId/movimientos': typeof NegocioBusinessIdMovimientosRoute
+  '/negocio/$businessId/productos': typeof NegocioBusinessIdProductosRoute
+  '/negocio/$businessId': typeof NegocioBusinessIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/analisis': typeof AnalisisRoute
-  '/aprender': typeof AprenderRoute
-  '/facturacion': typeof FacturacionRoute
-  '/impuestos': typeof ImpuestosRoute
-  '/movimientos': typeof MovimientosRoute
-  '/productos': typeof ProductosRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
+  '/registro': typeof RegistroRoute
+  '/negocio/$businessId': typeof NegocioBusinessIdRouteWithChildren
+  '/negocio/$businessId/analisis': typeof NegocioBusinessIdAnalisisRoute
+  '/negocio/$businessId/aprender': typeof NegocioBusinessIdAprenderRoute
+  '/negocio/$businessId/facturacion': typeof NegocioBusinessIdFacturacionRoute
+  '/negocio/$businessId/impuestos': typeof NegocioBusinessIdImpuestosRoute
+  '/negocio/$businessId/movimientos': typeof NegocioBusinessIdMovimientosRoute
+  '/negocio/$businessId/productos': typeof NegocioBusinessIdProductosRoute
+  '/negocio/$businessId/': typeof NegocioBusinessIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/analisis'
-    | '/aprender'
-    | '/facturacion'
-    | '/impuestos'
-    | '/movimientos'
-    | '/productos'
+    | '/dashboard'
+    | '/login'
+    | '/registro'
+    | '/negocio/$businessId'
+    | '/negocio/$businessId/analisis'
+    | '/negocio/$businessId/aprender'
+    | '/negocio/$businessId/facturacion'
+    | '/negocio/$businessId/impuestos'
+    | '/negocio/$businessId/movimientos'
+    | '/negocio/$businessId/productos'
+    | '/negocio/$businessId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/analisis'
-    | '/aprender'
-    | '/facturacion'
-    | '/impuestos'
-    | '/movimientos'
-    | '/productos'
+    | '/dashboard'
+    | '/login'
+    | '/registro'
+    | '/negocio/$businessId/analisis'
+    | '/negocio/$businessId/aprender'
+    | '/negocio/$businessId/facturacion'
+    | '/negocio/$businessId/impuestos'
+    | '/negocio/$businessId/movimientos'
+    | '/negocio/$businessId/productos'
+    | '/negocio/$businessId'
   id:
     | '__root__'
     | '/'
-    | '/analisis'
-    | '/aprender'
-    | '/facturacion'
-    | '/impuestos'
-    | '/movimientos'
-    | '/productos'
+    | '/dashboard'
+    | '/login'
+    | '/registro'
+    | '/negocio/$businessId'
+    | '/negocio/$businessId/analisis'
+    | '/negocio/$businessId/aprender'
+    | '/negocio/$businessId/facturacion'
+    | '/negocio/$businessId/impuestos'
+    | '/negocio/$businessId/movimientos'
+    | '/negocio/$businessId/productos'
+    | '/negocio/$businessId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AnalisisRoute: typeof AnalisisRoute
-  AprenderRoute: typeof AprenderRoute
-  FacturacionRoute: typeof FacturacionRoute
-  ImpuestosRoute: typeof ImpuestosRoute
-  MovimientosRoute: typeof MovimientosRoute
-  ProductosRoute: typeof ProductosRoute
+  DashboardRoute: typeof DashboardRoute
+  LoginRoute: typeof LoginRoute
+  RegistroRoute: typeof RegistroRoute
+  NegocioBusinessIdRoute: typeof NegocioBusinessIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/productos': {
-      id: '/productos'
-      path: '/productos'
-      fullPath: '/productos'
-      preLoaderRoute: typeof ProductosRouteImport
+    '/registro': {
+      id: '/registro'
+      path: '/registro'
+      fullPath: '/registro'
+      preLoaderRoute: typeof RegistroRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/movimientos': {
-      id: '/movimientos'
-      path: '/movimientos'
-      fullPath: '/movimientos'
-      preLoaderRoute: typeof MovimientosRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/impuestos': {
-      id: '/impuestos'
-      path: '/impuestos'
-      fullPath: '/impuestos'
-      preLoaderRoute: typeof ImpuestosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/facturacion': {
-      id: '/facturacion'
-      path: '/facturacion'
-      fullPath: '/facturacion'
-      preLoaderRoute: typeof FacturacionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/aprender': {
-      id: '/aprender'
-      path: '/aprender'
-      fullPath: '/aprender'
-      preLoaderRoute: typeof AprenderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/analisis': {
-      id: '/analisis'
-      path: '/analisis'
-      fullPath: '/analisis'
-      preLoaderRoute: typeof AnalisisRouteImport
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -172,17 +213,94 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/negocio/$businessId': {
+      id: '/negocio/$businessId'
+      path: '/negocio/$businessId'
+      fullPath: '/negocio/$businessId'
+      preLoaderRoute: typeof NegocioBusinessIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/negocio/$businessId/': {
+      id: '/negocio/$businessId/'
+      path: '/'
+      fullPath: '/negocio/$businessId/'
+      preLoaderRoute: typeof NegocioBusinessIdIndexRouteImport
+      parentRoute: typeof NegocioBusinessIdRoute
+    }
+    '/negocio/$businessId/productos': {
+      id: '/negocio/$businessId/productos'
+      path: '/productos'
+      fullPath: '/negocio/$businessId/productos'
+      preLoaderRoute: typeof NegocioBusinessIdProductosRouteImport
+      parentRoute: typeof NegocioBusinessIdRoute
+    }
+    '/negocio/$businessId/movimientos': {
+      id: '/negocio/$businessId/movimientos'
+      path: '/movimientos'
+      fullPath: '/negocio/$businessId/movimientos'
+      preLoaderRoute: typeof NegocioBusinessIdMovimientosRouteImport
+      parentRoute: typeof NegocioBusinessIdRoute
+    }
+    '/negocio/$businessId/impuestos': {
+      id: '/negocio/$businessId/impuestos'
+      path: '/impuestos'
+      fullPath: '/negocio/$businessId/impuestos'
+      preLoaderRoute: typeof NegocioBusinessIdImpuestosRouteImport
+      parentRoute: typeof NegocioBusinessIdRoute
+    }
+    '/negocio/$businessId/facturacion': {
+      id: '/negocio/$businessId/facturacion'
+      path: '/facturacion'
+      fullPath: '/negocio/$businessId/facturacion'
+      preLoaderRoute: typeof NegocioBusinessIdFacturacionRouteImport
+      parentRoute: typeof NegocioBusinessIdRoute
+    }
+    '/negocio/$businessId/aprender': {
+      id: '/negocio/$businessId/aprender'
+      path: '/aprender'
+      fullPath: '/negocio/$businessId/aprender'
+      preLoaderRoute: typeof NegocioBusinessIdAprenderRouteImport
+      parentRoute: typeof NegocioBusinessIdRoute
+    }
+    '/negocio/$businessId/analisis': {
+      id: '/negocio/$businessId/analisis'
+      path: '/analisis'
+      fullPath: '/negocio/$businessId/analisis'
+      preLoaderRoute: typeof NegocioBusinessIdAnalisisRouteImport
+      parentRoute: typeof NegocioBusinessIdRoute
+    }
   }
 }
 
+interface NegocioBusinessIdRouteChildren {
+  NegocioBusinessIdAnalisisRoute: typeof NegocioBusinessIdAnalisisRoute
+  NegocioBusinessIdAprenderRoute: typeof NegocioBusinessIdAprenderRoute
+  NegocioBusinessIdFacturacionRoute: typeof NegocioBusinessIdFacturacionRoute
+  NegocioBusinessIdImpuestosRoute: typeof NegocioBusinessIdImpuestosRoute
+  NegocioBusinessIdMovimientosRoute: typeof NegocioBusinessIdMovimientosRoute
+  NegocioBusinessIdProductosRoute: typeof NegocioBusinessIdProductosRoute
+  NegocioBusinessIdIndexRoute: typeof NegocioBusinessIdIndexRoute
+}
+
+const NegocioBusinessIdRouteChildren: NegocioBusinessIdRouteChildren = {
+  NegocioBusinessIdAnalisisRoute: NegocioBusinessIdAnalisisRoute,
+  NegocioBusinessIdAprenderRoute: NegocioBusinessIdAprenderRoute,
+  NegocioBusinessIdFacturacionRoute: NegocioBusinessIdFacturacionRoute,
+  NegocioBusinessIdImpuestosRoute: NegocioBusinessIdImpuestosRoute,
+  NegocioBusinessIdMovimientosRoute: NegocioBusinessIdMovimientosRoute,
+  NegocioBusinessIdProductosRoute: NegocioBusinessIdProductosRoute,
+  NegocioBusinessIdIndexRoute: NegocioBusinessIdIndexRoute,
+}
+
+const NegocioBusinessIdRouteWithChildren =
+  NegocioBusinessIdRoute._addFileChildren(NegocioBusinessIdRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AnalisisRoute: AnalisisRoute,
-  AprenderRoute: AprenderRoute,
-  FacturacionRoute: FacturacionRoute,
-  ImpuestosRoute: ImpuestosRoute,
-  MovimientosRoute: MovimientosRoute,
-  ProductosRoute: ProductosRoute,
+  DashboardRoute: DashboardRoute,
+  LoginRoute: LoginRoute,
+  RegistroRoute: RegistroRoute,
+  NegocioBusinessIdRoute: NegocioBusinessIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

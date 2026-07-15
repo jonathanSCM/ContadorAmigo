@@ -36,3 +36,9 @@ _version-simple-html/
 *.zip
 .vercel
 .wrangler
+
+# Base de datos local y secretos
+.env
+.env.*
+data/
+drizzle/
