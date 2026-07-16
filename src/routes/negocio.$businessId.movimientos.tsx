@@ -73,11 +73,12 @@ function Movimientos() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const amt = parseFloat(amount);
-    if (!concept.trim() || !amt || amt <= 0) {
+    const total = parseFloat(amount);
+    if (!concept.trim() || !total || total <= 0) {
       toast.error("Completa concepto y monto válido");
       return;
     }
+    const amt = hasInvoice ? Math.round((total / (1 + IVA_RATE)) * 100) / 100 : total;
     const iso = new Date(`${date}T12:00:00`).toISOString();
     const providerFields =
       type === "gasto"
@@ -132,7 +133,8 @@ function Movimientos() {
     setEditingId(m.id);
     setType(m.type);
     setConcept(m.concept);
-    setAmount(String(m.amountNet));
+    const total = m.hasInvoice ? Math.round(m.amountNet * (1 + IVA_RATE) * 100) / 100 : m.amountNet;
+    setAmount(String(total));
     setHasInvoice(m.hasInvoice);
     setCategory(m.category);
     setDate(m.date.slice(0, 10));
@@ -206,9 +208,9 @@ function Movimientos() {
     [filtered, pageSafe],
   );
 
-  const amt = parseFloat(amount) || 0;
-  const previewGross = hasInvoice ? amt * (1 + IVA_RATE) : amt;
-  const previewIva = hasInvoice ? amt * IVA_RATE : 0;
+  const previewTotal = parseFloat(amount) || 0;
+  const previewNet = hasInvoice ? previewTotal / (1 + IVA_RATE) : previewTotal;
+  const previewIva = hasInvoice ? previewTotal - previewNet : 0;
 
   return (
     <main className="mx-auto grid max-w-7xl grid-cols-12 gap-4 p-4 sm:gap-8 sm:p-6">
@@ -266,7 +268,7 @@ function Movimientos() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="mb-2 block text-[10px] font-bold uppercase opacity-70">
-                  Monto neto (Bs)
+                  Monto total (Bs)
                 </label>
                 <input
                   inputMode="decimal"
@@ -360,11 +362,11 @@ function Movimientos() {
               </div>
             )}
 
-            {amt > 0 && (
+            {previewTotal > 0 && (
               <div className="rounded-lg bg-white/10 p-3 text-xs">
                 <div className="flex justify-between">
-                  <span className="opacity-70">Neto</span>
-                  <span className="font-bold">{formatBs(amt)}</span>
+                  <span className="opacity-70">Total</span>
+                  <span className="font-bold">{formatBs(previewTotal)}</span>
                 </div>
                 {previewIva > 0 && (
                   <div className="mt-1 flex justify-between">
@@ -373,8 +375,8 @@ function Movimientos() {
                   </div>
                 )}
                 <div className="mt-2 flex justify-between border-t border-white/20 pt-2">
-                  <span className="opacity-70">Total</span>
-                  <span className="text-lg font-extrabold">{formatBs(previewGross)}</span>
+                  <span className="opacity-70">Neto</span>
+                  <span className="text-lg font-extrabold">{formatBs(previewNet)}</span>
                 </div>
               </div>
             )}
