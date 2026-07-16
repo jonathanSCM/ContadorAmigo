@@ -1,5 +1,5 @@
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { ConceptPopover } from "@/components/ConceptPopover";
 import { listMovements } from "@/lib/movements.server";
 import { updateBusiness } from "@/lib/businesses.server";
@@ -7,10 +7,13 @@ import type { Movement } from "@/lib/storage";
 import { formatBs, IT_RATE, IUE_RATE, nextTaxDue } from "@/lib/tax";
 import {
   annualEstimate,
+  filterByPeriod,
+  filterByRange,
   periodRange,
   profitAndLoss,
   profitAndLossRange,
   providerSummary,
+  providerSummaryRange,
   type Period,
 } from "@/lib/analysis";
 import { compareRegimes, type RegimeOption } from "@/lib/regimes";
@@ -47,17 +50,41 @@ function Impuestos() {
   const { business } = useRouteContext({ from: "/negocio/$businessId" });
   const [movs, setMovs] = useState<Movement[]>([]);
   const [capital, setCapital] = useState("22000");
-  const [period, setPeriod] = useState<Period>("mes");
+  const [period, setPeriod] = useState<Period | "custom">("mes");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
   const [sector, setSectorState] = useState<Sector>(business.sector ?? DEFAULT_SECTOR);
 
   useEffect(() => {
     listMovements({ data: businessId }).then(setMovs);
   }, [businessId]);
 
-  const isTaxPeriod = period === "mes" || period === "anio" || period === "todo";
+  useEffect(() => {
+    setExpandedProvider(null);
+  }, [period, customFrom, customTo]);
 
-  const range = useMemo(() => periodRange(movs, period), [movs, period]);
-  const pnl = useMemo(() => profitAndLoss(movs, period), [movs, period]);
+  const isCustom = period === "custom";
+  const customStart = customFrom ? new Date(`${customFrom}T00:00:00`) : null;
+  const customEnd = customTo ? new Date(`${customTo}T23:59:59.999`) : null;
+  const hasCustomRange = isCustom && customStart && customEnd;
+
+  const isTaxPeriod =
+    period === "mes" || period === "anio" || period === "todo" || Boolean(hasCustomRange);
+
+  const range = useMemo(
+    () =>
+      hasCustomRange
+        ? { start: customStart!, end: customEnd! }
+        : periodRange(movs, isCustom ? "todo" : period),
+    [movs, period, hasCustomRange, customStart, customEnd, isCustom],
+  );
+  const pnl = useMemo(
+    () =>
+      hasCustomRange
+        ? profitAndLossRange(movs, customStart!, customEnd!)
+        : profitAndLoss(movs, isCustom ? "todo" : period),
+    [movs, period, hasCustomRange, customStart, customEnd, isCustom],
+  );
   const gastosTotal = pnl.costoVentas + pnl.gastosOperativos;
 
   const due = useMemo(() => nextTaxDue(business.nit ?? ""), [business.nit]);
@@ -81,7 +108,34 @@ function Impuestos() {
   const iueGestion = Math.max(0, gestionPnl.utilidadOperativa) * IUE_RATE;
   const gestionEnCurso = new Date() <= gestion.end;
 
-  const providers = useMemo(() => providerSummary(movs, period), [movs, period]);
+  const providers = useMemo(
+    () =>
+      hasCustomRange
+        ? providerSummaryRange(movs, customStart!, customEnd!)
+        : providerSummary(movs, isCustom ? "todo" : period),
+    [movs, period, hasCustomRange, customStart, customEnd, isCustom],
+  );
+  const inPeriodMovs = useMemo(
+    () =>
+      hasCustomRange
+        ? filterByRange(movs, customStart!, customEnd!)
+        : filterByPeriod(movs, isCustom ? "todo" : period),
+    [movs, period, hasCustomRange, customStart, customEnd, isCustom],
+  );
+  const topByCompras = useMemo(
+    () => (providers.length > 0 ? [...providers].sort((a, b) => b.compras - a.compras)[0] : null),
+    [providers],
+  );
+  const [expandedProvider, setExpandedProvider] = useState<string | null>(null);
+  const providerHistory = useMemo(
+    () =>
+      expandedProvider
+        ? inPeriodMovs
+            .filter((m) => m.type === "gasto" && m.providerName === expandedProvider)
+            .sort((a, b) => b.date.localeCompare(a.date))
+        : [],
+    [inPeriodMovs, expandedProvider],
+  );
 
   const changeSector = (s: Sector) => {
     setSectorState(s);
@@ -111,14 +165,46 @@ function Impuestos() {
               {p.label}
             </button>
           ))}
+          <button
+            onClick={() => setPeriod("custom")}
+            className={`rounded-full px-3 py-1.5 transition-all sm:px-4 ${
+              isCustom ? "bg-foreground text-background" : "text-foreground/60"
+            }`}
+          >
+            Personalizado
+          </button>
         </div>
-        <p className="text-sm text-foreground/60">
-          Período: <span className="font-bold text-foreground">{fmtDate(range.start)}</span> —{" "}
-          <span className="font-bold text-foreground">{fmtDate(range.end)}</span>
-        </p>
+        {isCustom ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="text-xs font-bold text-foreground/50">Del</label>
+            <input
+              type="date"
+              value={customFrom}
+              onChange={(e) => setCustomFrom(e.target.value)}
+              className="rounded-full border border-border bg-card px-3 py-1.5 text-sm focus:border-primary/40 focus:outline-none"
+            />
+            <label className="text-xs font-bold text-foreground/50">al</label>
+            <input
+              type="date"
+              value={customTo}
+              onChange={(e) => setCustomTo(e.target.value)}
+              className="rounded-full border border-border bg-card px-3 py-1.5 text-sm focus:border-primary/40 focus:outline-none"
+            />
+          </div>
+        ) : (
+          <p className="text-sm text-foreground/60">
+            Período: <span className="font-bold text-foreground">{fmtDate(range.start)}</span> —{" "}
+            <span className="font-bold text-foreground">{fmtDate(range.end)}</span>
+          </p>
+        )}
       </section>
 
-      {!isTaxPeriod ? (
+      {isCustom && !hasCustomRange ? (
+        <section className="animate-reveal [animation-delay:50ms] flex gap-3 rounded-2xl bg-secondary p-6 text-sm text-foreground/70">
+          <Info className="mt-0.5 size-4 shrink-0 text-primary" />
+          <p>Elige una fecha de inicio y una de fin para ver el cálculo de ese rango.</p>
+        </section>
+      ) : !isTaxPeriod ? (
         <section className="animate-reveal [animation-delay:50ms] space-y-4">
           <div className="rounded-3xl bg-card p-8 ring-1 ring-black/5">
             <p className="mb-1 text-xs uppercase text-foreground/50">
@@ -255,6 +341,28 @@ function Impuestos() {
                   {providers.length} proveedor{providers.length === 1 ? "" : "es"}
                 </span>
               </div>
+
+              <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl bg-secondary p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/50">
+                    Proveedor más usado
+                  </p>
+                  <p className="mt-1 font-serif text-lg italic">{topByCompras?.name ?? "—"}</p>
+                  <p className="text-xs text-foreground/50">
+                    {topByCompras ? `${topByCompras.compras} compras` : "Sin datos"}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-secondary p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/50">
+                    Mayor monto comprado
+                  </p>
+                  <p className="mt-1 font-serif text-lg italic">{providers[0]?.name ?? "—"}</p>
+                  <p className="text-xs text-foreground/50">
+                    {providers[0] ? formatBs(providers[0].monto) : "Sin datos"}
+                  </p>
+                </div>
+              </div>
+
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[480px] text-sm">
                   <thead>
@@ -268,34 +376,68 @@ function Impuestos() {
                   </thead>
                   <tbody>
                     {providers.map((p) => (
-                      <tr key={p.name} className="border-b border-border/60 last:border-0">
-                        <td className="py-2.5 pr-3 font-bold">{p.name}</td>
-                        <td className="py-2.5 pr-3 text-right">{p.compras}</td>
-                        <td className="py-2.5 pr-3 text-right">
-                          <span
-                            className={
-                              p.facturas === p.compras
-                                ? "text-success"
-                                : p.facturas === 0
-                                  ? "text-danger"
-                                  : "text-warning-foreground"
-                            }
-                          >
-                            {p.facturas}/{p.compras}
-                          </span>
-                        </td>
-                        <td className="py-2.5 pr-3 text-right font-mono">{formatBs(p.monto)}</td>
-                        <td className="py-2.5 text-right font-mono text-success">
-                          {p.creditoFiscal > 0 ? formatBs(p.creditoFiscal) : "—"}
-                        </td>
-                      </tr>
+                      <Fragment key={p.name}>
+                        <tr
+                          onClick={() => setExpandedProvider(expandedProvider === p.name ? null : p.name)}
+                          className="cursor-pointer border-b border-border/60 transition-colors last:border-0 hover:bg-secondary"
+                        >
+                          <td className="py-2.5 pr-3 font-bold">{p.name}</td>
+                          <td className="py-2.5 pr-3 text-right">{p.compras}</td>
+                          <td className="py-2.5 pr-3 text-right">
+                            <span
+                              className={
+                                p.facturas === p.compras
+                                  ? "text-success"
+                                  : p.facturas === 0
+                                    ? "text-danger"
+                                    : "text-warning-foreground"
+                              }
+                            >
+                              {p.facturas}/{p.compras}
+                            </span>
+                          </td>
+                          <td className="py-2.5 pr-3 text-right font-mono">{formatBs(p.monto)}</td>
+                          <td className="py-2.5 text-right font-mono text-success">
+                            {p.creditoFiscal > 0 ? formatBs(p.creditoFiscal) : "—"}
+                          </td>
+                        </tr>
+                        {expandedProvider === p.name && (
+                          <tr className="border-b border-border/60 last:border-0">
+                            <td colSpan={5} className="bg-secondary p-3">
+                              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-foreground/50">
+                                Historial de compras a {p.name}
+                              </p>
+                              <div className="space-y-1.5">
+                                {providerHistory.map((m) => (
+                                  <div key={m.id} className="flex items-center justify-between text-xs">
+                                    <span className="text-foreground/70">
+                                      {new Date(m.date).toLocaleDateString("es-BO", {
+                                        day: "numeric",
+                                        month: "short",
+                                        year: "numeric",
+                                      })}{" "}
+                                      · {m.concept}
+                                      {m.hasInvoice ? " · Con factura" : " · Sin factura"}
+                                    </span>
+                                    <span className="font-mono font-bold">{formatBs(m.amountNet)}</span>
+                                  </div>
+                                ))}
+                                {providerHistory.length === 0 && (
+                                  <p className="text-xs text-foreground/50">Sin compras en este período.</p>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
                     ))}
                   </tbody>
                 </table>
               </div>
               <p className="mt-4 text-xs text-foreground/50">
                 "Facturas" muestra cuántas de tus compras a ese proveedor tuvieron factura. Si un
-                proveedor casi nunca te da factura, estás perdiendo crédito fiscal con él.
+                proveedor casi nunca te da factura, estás perdiendo crédito fiscal con él. Toca un
+                proveedor para ver su historial de compras.
               </p>
             </section>
           )}

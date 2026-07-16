@@ -13,7 +13,7 @@ import {
 import { loadDemoProducts } from "@/lib/products.server";
 import type { Movement, MovementType } from "@/lib/storage";
 import { formatBs, IVA_RATE } from "@/lib/tax";
-import { Download, Pencil, RotateCcw, Search, Trash2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, Pencil, RotateCcw, Search, Trash2, X } from "lucide-react";
 
 export const Route = createFileRoute("/negocio/$businessId/movimientos")({
   head: () => ({
@@ -25,8 +25,9 @@ export const Route = createFileRoute("/negocio/$businessId/movimientos")({
   component: Movimientos,
 });
 
-const CATEGORIES = ["Ventas", "Servicios", "Insumos", "Fijos", "Salarios", "Marketing", "Otros"];
+const CATEGORIES = ["Ventas", "Servicios", "Insumos", "Fijos", "Salarios", "Marketing", "Activo Fijo", "Otros"];
 const today = () => new Date().toISOString().slice(0, 10);
+const PAGE_SIZE = 15;
 
 function Movimientos() {
   const { businessId } = Route.useParams();
@@ -46,6 +47,9 @@ function Movimientos() {
   const [filter, setFilter] = useState<"todos" | MovementType>("todos");
   const [catFilter, setCatFilter] = useState<string>("todas");
   const [search, setSearch] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [page, setPage] = useState(1);
 
   const refresh = () => listMovements({ data: businessId }).then(setMovs);
 
@@ -176,14 +180,31 @@ function Movimientos() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return movs.filter((m) => {
-      if (filter !== "todos" && m.type !== filter) return false;
-      if (catFilter !== "todas" && m.category !== catFilter) return false;
-      if (q && !m.concept.toLowerCase().includes(q) && !m.category.toLowerCase().includes(q))
-        return false;
-      return true;
-    });
-  }, [movs, filter, catFilter, search]);
+    return movs
+      .filter((m) => {
+        if (filter !== "todos" && m.type !== filter) return false;
+        if (catFilter !== "todas" && m.category !== catFilter) return false;
+        if (q && !m.concept.toLowerCase().includes(q) && !m.category.toLowerCase().includes(q))
+          return false;
+        const day = m.date.slice(0, 10);
+        if (dateFrom && day < dateFrom) return false;
+        if (dateTo && day > dateTo) return false;
+        return true;
+      })
+      .sort((a, b) => b.date.localeCompare(a.date));
+  }, [movs, filter, catFilter, search, dateFrom, dateTo]);
+
+  // Volver a la página 1 cada vez que cambian los filtros.
+  useEffect(() => {
+    setPage(1);
+  }, [filter, catFilter, search, dateFrom, dateTo]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageSafe = Math.min(page, totalPages);
+  const paginated = useMemo(
+    () => filtered.slice((pageSafe - 1) * PAGE_SIZE, pageSafe * PAGE_SIZE),
+    [filtered, pageSafe],
+  );
 
   const amt = parseFloat(amount) || 0;
   const previewGross = hasInvoice ? amt * (1 + IVA_RATE) : amt;
@@ -426,8 +447,36 @@ function Movimientos() {
           </select>
         </div>
 
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <label className="text-xs font-bold text-foreground/50">Del</label>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="rounded-full border border-border bg-card px-3 py-1.5 text-sm focus:border-primary/40 focus:outline-none"
+          />
+          <label className="text-xs font-bold text-foreground/50">al</label>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="rounded-full border border-border bg-card px-3 py-1.5 text-sm focus:border-primary/40 focus:outline-none"
+          />
+          {(dateFrom || dateTo) && (
+            <button
+              onClick={() => {
+                setDateFrom("");
+                setDateTo("");
+              }}
+              className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1.5 text-xs font-bold text-foreground/60 hover:text-foreground"
+            >
+              <X className="size-3" /> Quitar fechas
+            </button>
+          )}
+        </div>
+
         <div className="space-y-px overflow-hidden rounded-2xl ring-1 ring-black/5">
-          {filtered.map((m) => {
+          {paginated.map((m) => {
             const gross = m.hasInvoice ? m.amountNet * (1 + IVA_RATE) : m.amountNet;
             const iva = m.hasInvoice ? m.amountNet * IVA_RATE : 0;
             const isIn = m.type === "ingreso";
@@ -494,6 +543,32 @@ function Movimientos() {
             </div>
           )}
         </div>
+
+        {filtered.length > 0 && (
+          <div className="mt-4 flex items-center justify-between gap-4">
+            <p className="text-xs text-foreground/50">
+              Página {pageSafe} de {totalPages} · {filtered.length} movimientos
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={pageSafe <= 1}
+                className="grid size-8 place-items-center rounded-full border border-border bg-card text-foreground/60 transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-30"
+                aria-label="Página anterior"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={pageSafe >= totalPages}
+                className="grid size-8 place-items-center rounded-full border border-border bg-card text-foreground/60 transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-30"
+                aria-label="Página siguiente"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         <p className="mt-4 text-xs text-foreground/50">
           <ConceptPopover conceptKey="credito-fiscal" label="¿Qué es el crédito fiscal?" />

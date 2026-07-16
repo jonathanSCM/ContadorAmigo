@@ -1,10 +1,12 @@
 // CRUD de emprendimientos (antes vivía en lib/profiles.ts sobre localStorage).
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
-import { businesses } from "@/db/schema";
+import { businesses, movements } from "@/db/schema";
 import { requireUserId } from "./auth.server";
 import type { Sector } from "./sectors";
+import type { Movement } from "./storage";
+import { calcMonthly, healthStatus, type Health } from "./tax";
 
 // Paleta curada para las tarjetas del dashboard (coherente con la identidad visual).
 export const CARD_COLORS = [
@@ -30,6 +32,15 @@ export interface BusinessRow {
   createdAt: string;
 }
 
+export interface BusinessSummary {
+  ingresosMes: number;
+  utilidadMes: number;
+  health: Health;
+  healthLabel: string;
+}
+
+export type BusinessRowWithSummary = BusinessRow & { summary: BusinessSummary };
+
 /** Lanza si `businessId` no existe o no pertenece a `userId`. Úsalo en otras server functions. */
 export const assertOwnsBusiness = createServerOnlyFn(async (userId: string, businessId: string): Promise<void> => {
   const rows = await db
@@ -47,6 +58,61 @@ export const listMyBusinesses = createServerFn({ method: "GET" }).handler(
     return rows
       .map((r) => ({ ...r, sector: (r.sector as Sector | null) ?? null }))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  },
+);
+
+/** Igual que `listMyBusinesses`, pero con un resumen financiero del mes actual por negocio (para el dashboard). */
+export const listMyBusinessesWithSummary = createServerFn({ method: "GET" }).handler(
+  async (): Promise<BusinessRowWithSummary[]> => {
+    const userId = await requireUserId();
+    const rows = await db.select().from(businesses).where(eq(businesses.userId, userId));
+    const bizList = rows
+      .map((r) => ({ ...r, sector: (r.sector as Sector | null) ?? null }))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    const movsByBusiness = new Map<string, Movement[]>();
+    if (bizList.length > 0) {
+      const rowsMovs = await db
+        .select()
+        .from(movements)
+        .where(
+          inArray(
+            movements.businessId,
+            bizList.map((b) => b.id),
+          ),
+        );
+      for (const m of rowsMovs) {
+        const list = movsByBusiness.get(m.businessId) ?? [];
+        list.push({
+          id: m.id,
+          type: m.type as Movement["type"],
+          concept: m.concept,
+          amountNet: m.amountNet,
+          hasInvoice: m.hasInvoice,
+          category: m.category,
+          date: m.date,
+          note: m.note ?? undefined,
+          providerName: m.providerName ?? undefined,
+          invoiceNumber: m.invoiceNumber ?? undefined,
+          providerNit: m.providerNit ?? undefined,
+        });
+        movsByBusiness.set(m.businessId, list);
+      }
+    }
+
+    return bizList.map((b) => {
+      const monthly = calcMonthly(movsByBusiness.get(b.id) ?? []);
+      const h = healthStatus(monthly);
+      return {
+        ...b,
+        summary: {
+          ingresosMes: monthly.ingresos,
+          utilidadMes: monthly.utilidad,
+          health: h.level,
+          healthLabel: h.label,
+        },
+      };
+    });
   },
 );
 

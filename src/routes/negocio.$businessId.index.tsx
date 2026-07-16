@@ -346,6 +346,7 @@ function BreakdownCard({ pnl }: { pnl: PnL }) {
   const segments = [
     { label: "Costo de ventas", hint: "insumos y mercadería", value: pnl.costoVentas, color: "bg-warning" },
     { label: "Gastos operativos", hint: "alquiler, sueldos, marketing…", value: pnl.gastosOperativos, color: "bg-danger" },
+    { label: "Inversión", hint: "activos fijos comprados", value: pnl.inversion, color: "bg-accent-foreground/40" },
     { label: "Impuestos", hint: "IVA + IT del mes", value: pnl.impuestos, color: "bg-primary" },
     { label: "Utilidad neta", hint: "lo que te queda", value: Math.max(0, pnl.utilidadNeta), color: "bg-success" },
   ];

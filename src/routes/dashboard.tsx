@@ -6,10 +6,12 @@ import {
   CARD_COLORS,
   createBusiness,
   deleteBusiness,
-  listMyBusinesses,
+  listMyBusinessesWithSummary,
   updateBusiness,
   type BusinessRow,
+  type BusinessRowWithSummary,
 } from "@/lib/businesses.server";
+import { formatBs } from "@/lib/tax";
 import { SECTOR_INFO, type Sector } from "@/lib/sectors";
 import { Building2, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
 
@@ -19,7 +21,7 @@ export const Route = createFileRoute("/dashboard")({
     if (!user) throw redirect({ to: "/login" });
     return { user };
   },
-  loader: async () => ({ businesses: await listMyBusinesses() }),
+  loader: async () => ({ businesses: await listMyBusinessesWithSummary() }),
   head: () => ({ meta: [{ title: "Mis emprendimientos — ContadorAmigo" }] }),
   component: Dashboard,
 });
@@ -115,10 +117,17 @@ function Dashboard() {
   );
 }
 
-function BizCard({ biz, onEdit }: { biz: BusinessRow; onEdit: () => void }) {
+const HEALTH_DOT: Record<string, string> = {
+  verde: "bg-emerald-400",
+  amarillo: "bg-amber-400",
+  rojo: "bg-red-400",
+};
+
+function BizCard({ biz, onEdit }: { biz: BusinessRowWithSummary; onEdit: () => void }) {
+  const { summary } = biz;
   return (
     <div
-      className="group relative flex min-h-[152px] flex-col justify-between overflow-hidden rounded-3xl p-6 text-white shadow-sm"
+      className="group relative flex min-h-[192px] flex-col justify-between overflow-hidden rounded-3xl p-6 text-white shadow-sm"
       style={{ background: `linear-gradient(135deg, ${biz.cardColor}, ${biz.cardColor}CC)` }}
     >
       <button
@@ -128,18 +137,33 @@ function BizCard({ biz, onEdit }: { biz: BusinessRow; onEdit: () => void }) {
       >
         <Pencil className="size-3.5" />
       </button>
-      <div className="flex items-center gap-2">
-        <Building2 className="size-5 opacity-80" />
-        <span className="text-xs font-bold uppercase tracking-widest opacity-80">
-          {biz.sector ? SECTOR_INFO[biz.sector].label : "Emprendimiento"}
-        </span>
-      </div>
       <div>
-        <h3 className="font-serif text-2xl italic leading-tight">{biz.name}</h3>
+        <div className="flex items-center gap-2">
+          <Building2 className="size-5 opacity-80" />
+          <span className="text-xs font-bold uppercase tracking-widest opacity-80">
+            {biz.sector ? SECTOR_INFO[biz.sector].label : "Emprendimiento"}
+          </span>
+        </div>
+        <h3 className="mt-2 font-serif text-2xl italic leading-tight">{biz.name}</h3>
+      </div>
+
+      <div className="rounded-2xl bg-black/15 p-3 backdrop-blur-sm">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">
+              Utilidad del mes
+            </p>
+            <p className="font-serif text-xl italic">{formatBs(summary.utilidadMes)}</p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold">
+            <span className={`size-1.5 rounded-full ${HEALTH_DOT[summary.health]}`} />
+            {summary.healthLabel}
+          </span>
+        </div>
         <Link
           to="/negocio/$businessId"
           params={{ businessId: biz.id }}
-          className="mt-3 inline-flex items-center gap-1 text-sm font-bold underline underline-offset-2 opacity-90 hover:opacity-100"
+          className="mt-2 inline-flex items-center gap-1 text-sm font-bold underline underline-offset-2 opacity-90 hover:opacity-100"
         >
           Entrar →
         </Link>

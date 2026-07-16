@@ -163,6 +163,14 @@ export const CONCEPTS: Concept[] = [
       "Cada vez que compras con factura, el 13% de esa compra se convierte en crédito fiscal y se resta del IVA que debes pagar por tus ventas. Ese descuento es tu ahorro tributario: dinero real que no sale de tu bolsillo gracias a pedir factura.",
     example: "Si compras Bs 1.000 con factura, generas Bs 130 de crédito fiscal que reduce el IVA que pagarás.",
   },
+  {
+    key: "balance-general",
+    term: "Balance General",
+    short: "Foto de lo que tienes, lo que debes y lo que es realmente tuyo.",
+    full:
+      "El Balance General (Estado de Situación Financiera) muestra, en una fecha dada, tus Activos (lo que tu negocio tiene: caja, banco, inventario, equipos), tus Pasivos (lo que debes: préstamos, cuentas por pagar) y tu Patrimonio (lo que realmente te pertenece: tu capital más las utilidades acumuladas). A diferencia del Estado de Resultados, que mide un período, el Balance mide un momento exacto. Aquí es un resumen simplificado que tú actualizas manualmente, no una contabilidad de partida doble.",
+    example: "Si tienes Bs 5.000 en activos y debes Bs 2.000, tu patrimonio es Bs 3.000.",
+  },
 ];
 
 export function findConcept(key: string): Concept | undefined {

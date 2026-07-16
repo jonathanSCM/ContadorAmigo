@@ -36,6 +36,7 @@ _version-simple-html/
 *.zip
 .vercel
 .wrangler
+.netlify
 
 # Base de datos local y secretos
 .env

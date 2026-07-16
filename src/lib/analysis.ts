@@ -12,6 +12,7 @@ export const gross = (m: Movement) =>
   m.hasInvoice ? m.amountNet * (1 + IVA_RATE) : m.amountNet;
 
 const COSTO_VENTAS_CATS = new Set(["Insumos"]);
+const INVERSION_CATS = new Set(["Activo Fijo"]);
 
 function startOfDay(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -76,7 +77,7 @@ export function filterByPeriod(
   });
 }
 
-function filterByRange(movs: Movement[], start: Date, end: Date): Movement[] {
+export function filterByRange(movs: Movement[], start: Date, end: Date): Movement[] {
   return movs.filter((m) => {
     const d = new Date(m.date);
     return d >= start && d <= end;
@@ -95,6 +96,7 @@ export interface PnL {
   margenBruto: number;
   gastosOperativos: number;
   operativos: OperativoRow[];
+  inversion: number;
   utilidadOperativa: number;
   ivaDebito: number;
   ivaCredito: number;
@@ -121,6 +123,7 @@ export function profitAndLossRange(movs: Movement[], start: Date, end: Date): Pn
 function pnlCore(inPeriod: Movement[]): PnL {
   let ingresos = 0;
   let costoVentas = 0;
+  let inversion = 0;
   let ivaDebito = 0;
   let ivaCredito = 0;
   const opMap = new Map<string, number>();
@@ -135,6 +138,8 @@ function pnlCore(inPeriod: Movement[]): PnL {
       ivaCredito += iva;
       if (COSTO_VENTAS_CATS.has(m.category)) {
         costoVentas += g;
+      } else if (INVERSION_CATS.has(m.category)) {
+        inversion += g;
       } else {
         opMap.set(m.category, (opMap.get(m.category) ?? 0) + g);
       }
@@ -146,7 +151,7 @@ function pnlCore(inPeriod: Movement[]): PnL {
     .map(([label, value]) => ({ label, value }))
     .sort((a, b) => b.value - a.value);
   const gastosOperativos = operativos.reduce((s, o) => s + o.value, 0);
-  const utilidadOperativa = utilidadBruta - gastosOperativos;
+  const utilidadOperativa = utilidadBruta - gastosOperativos - inversion;
 
   const ivaAPagar = Math.max(0, ivaDebito - ivaCredito);
   const it = ingresos * IT_RATE;
@@ -160,6 +165,7 @@ function pnlCore(inPeriod: Movement[]): PnL {
     margenBruto: ingresos > 0 ? utilidadBruta / ingresos : 0,
     gastosOperativos,
     operativos,
+    inversion,
     utilidadOperativa,
     ivaDebito,
     ivaCredito,
@@ -283,7 +289,15 @@ export interface ProviderRow {
 
 /** Agrupa los gastos por proveedor: cuántas compras, cuántas con factura y el monto. */
 export function providerSummary(movs: Movement[], period: Period, ref = new Date()): ProviderRow[] {
-  const inPeriod = filterByPeriod(movs, period, ref);
+  return providerSummaryCore(filterByPeriod(movs, period, ref));
+}
+
+/** Igual que `providerSummary`, pero sobre un rango de fechas explícito. */
+export function providerSummaryRange(movs: Movement[], start: Date, end: Date): ProviderRow[] {
+  return providerSummaryCore(filterByRange(movs, start, end));
+}
+
+function providerSummaryCore(inPeriod: Movement[]): ProviderRow[] {
   const map = new Map<string, ProviderRow>();
   for (const m of inPeriod) {
     if (m.type !== "gasto" || !m.providerName?.trim()) continue;

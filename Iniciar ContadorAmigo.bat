@@ -31,6 +31,14 @@ if not exist "node_modules" (
   echo.
 )
 
+REM --- Crear la base de datos local la primera vez ---
+if not exist "data\app.db" (
+  echo   Primera vez: creando la base de datos local (data\app.db)...
+  echo.
+  call npx drizzle-kit push
+  echo.
+)
+
 echo   Iniciando el sistema...
 echo   Se abrira solo en tu navegador:  http://localhost:8080
 echo.

@@ -58,3 +58,14 @@ export const products = sqliteTable("products", {
   cost: real("cost").notNull(),
   price: real("price").notNull(),
 });
+
+export const balanceItems = sqliteTable("balance_items", {
+  id: text("id").primaryKey(),
+  businessId: text("business_id")
+    .notNull()
+    .references(() => businesses.id, { onDelete: "cascade" }),
+  category: text("category").notNull(), // "activo_corriente" | "activo_fijo" | "pasivo" | "capital_propio"
+  name: text("name").notNull(), // ej: "Caja", "Equipos", "Préstamo BNB" (texto libre)
+  amount: real("amount").notNull(),
+  createdAt: text("created_at").notNull(),
+});
