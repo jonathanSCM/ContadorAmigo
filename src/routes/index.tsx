@@ -82,25 +82,26 @@ function Landing() {
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       {/* Nav */}
       <nav className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="ContadorAmigo" className="size-9" />
-            <span className="font-serif text-xl italic font-semibold tracking-tight">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:px-6 sm:py-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
+            <img src="/logo.png" alt="ContadorAmigo" className="size-8 shrink-0 sm:size-9" />
+            <span className="truncate font-serif text-base italic font-semibold tracking-tight sm:text-xl">
               ContadorAmigo
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <Link
               to="/login"
-              className="rounded-full px-4 py-2 text-sm font-bold text-foreground/70 hover:text-foreground"
+              className="whitespace-nowrap rounded-full px-2.5 py-1.5 text-xs font-bold text-foreground/70 hover:text-foreground sm:px-4 sm:py-2 sm:text-sm"
             >
               Iniciar sesión
             </Link>
             <Link
               to="/registro"
-              className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition-transform hover:scale-[1.02]"
+              className="whitespace-nowrap rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground transition-transform hover:scale-[1.02] sm:px-4 sm:py-2 sm:text-sm"
             >
-              Crear cuenta gratis
+              <span className="sm:hidden">Crear cuenta</span>
+              <span className="hidden sm:inline">Crear cuenta gratis</span>
             </Link>
           </div>
         </div>
