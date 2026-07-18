@@ -1,5 +1,6 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { getCurrentUser } from "@/lib/auth.server";
+import { HeroIllustration, MessyBooksIllustration } from "@/components/LandingIllustrations";
 import {
   Building2,
   CheckCircle2,
@@ -108,53 +109,61 @@ function Landing() {
           className="pointer-events-none absolute -top-32 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full opacity-[0.15] blur-3xl"
           style={{ background: "radial-gradient(closest-side, var(--color-primary), transparent)" }}
         />
-        <div className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 sm:py-28">
-          <p className="animate-reveal mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-primary">
-            <Sparkles className="size-3.5" />
-            Finanzas claras para el emprendedor boliviano
-          </p>
-          <h1 className="animate-reveal font-serif text-4xl italic leading-tight sm:text-6xl" style={{ animationDelay: "0.05s" }}>
-            Finanzas claras,
-            <br />
-            negocios que crecen.
-          </h1>
-          <p
-            className="animate-reveal mx-auto mt-6 max-w-xl text-lg text-foreground/60"
-            style={{ animationDelay: "0.1s" }}
-          >
-            Una plataforma digital visual y explicativa que ayuda a los emprendedores y pequeños
-            negocios de Bolivia a entender y controlar sus finanzas e impuestos, sin necesidad de
-            saber de contabilidad.
-          </p>
-          <div
-            className="animate-reveal mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
-            style={{ animationDelay: "0.15s" }}
-          >
-            <Link
-              to="/registro"
-              className="w-full rounded-xl bg-primary px-8 py-3.5 text-center font-bold text-primary-foreground shadow-xl shadow-black/10 transition-transform hover:scale-[1.02] sm:w-auto"
+        <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6 lg:text-left">
+          <div className="text-center lg:text-left">
+            <p className="animate-reveal mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-primary">
+              <Sparkles className="size-3.5" />
+              Finanzas claras para el emprendedor boliviano
+            </p>
+            <h1 className="animate-reveal font-serif text-4xl italic leading-tight sm:text-6xl" style={{ animationDelay: "0.05s" }}>
+              Finanzas claras,
+              <br />
+              negocios que crecen.
+            </h1>
+            <p
+              className="animate-reveal mx-auto mt-6 max-w-xl text-lg text-foreground/60 lg:mx-0"
+              style={{ animationDelay: "0.1s" }}
             >
-              Crear cuenta gratis
-            </Link>
-            <Link
-              to="/login"
-              className="w-full rounded-xl border border-border px-8 py-3.5 text-center font-bold text-foreground/70 transition-colors hover:text-foreground sm:w-auto"
+              Una plataforma digital visual y explicativa que ayuda a los emprendedores y pequeños
+              negocios de Bolivia a entender y controlar sus finanzas e impuestos, sin necesidad de
+              saber de contabilidad.
+            </p>
+            <div
+              className="animate-reveal mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start"
+              style={{ animationDelay: "0.15s" }}
             >
-              Ya tengo cuenta
-            </Link>
+              <Link
+                to="/registro"
+                className="w-full rounded-xl bg-primary px-8 py-3.5 text-center font-bold text-primary-foreground shadow-xl shadow-black/10 transition-transform hover:scale-[1.02] sm:w-auto"
+              >
+                Crear cuenta gratis
+              </Link>
+              <Link
+                to="/login"
+                className="w-full rounded-xl border border-border px-8 py-3.5 text-center font-bold text-foreground/70 transition-colors hover:text-foreground sm:w-auto"
+              >
+                Ya tengo cuenta
+              </Link>
+            </div>
+            <p
+              className="animate-reveal mt-6 text-xs font-medium text-foreground/40"
+              style={{ animationDelay: "0.2s" }}
+            >
+              Gratis · Sin tarjeta · Tus datos, siempre privados
+            </p>
           </div>
-          <p
-            className="animate-reveal mt-6 text-xs font-medium text-foreground/40"
-            style={{ animationDelay: "0.2s" }}
-          >
-            Gratis · Sin tarjeta · Tus datos, siempre privados
-          </p>
+          <div className="animate-reveal flex justify-center [animation-delay:0.1s] lg:justify-end">
+            <HeroIllustration />
+          </div>
         </div>
       </header>
 
       {/* El problema */}
       <section className="mx-auto max-w-5xl px-4 pb-20 sm:px-6">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.7fr_0.9fr_1.15fr] lg:items-center">
+          <div className="hidden lg:block">
+            <MessyBooksIllustration />
+          </div>
           <div>
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-primary">
               El problema que resolvemos
