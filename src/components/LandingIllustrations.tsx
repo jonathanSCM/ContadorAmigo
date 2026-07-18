@@ -41,34 +41,43 @@ export function HeroIllustration() {
       </g>
 
       {/* insignia: factura con IVA calculado */}
-      <g className="animate-pop" style={{ animationDelay: "1s" }} transform="translate(20 240)">
-        <rect width="118" height="72" rx="16" fill="var(--color-card)" stroke="var(--color-border)" />
-        <circle cx="26" cy="26" r="14" fill="var(--color-success)" opacity="0.18" />
-        <path d="M19 26 l5 5 l11 -11" fill="none" stroke="var(--color-success)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        <rect x="48" y="18" width="54" height="8" rx="4" fill="var(--color-foreground)" opacity="0.5" />
-        <rect x="48" y="32" width="38" height="7" rx="3.5" fill="var(--color-foreground)" opacity="0.25" />
-        <rect x="19" y="48" width="83" height="7" rx="3.5" fill="var(--color-foreground)" opacity="0.15" />
+      {/* nota: la posición (SVG transform) va en un <g> exterior y la animación (CSS
+          transform) en uno interior — si se mezclan en el mismo <g>, el transform de la
+          animación CSS pisa por completo el translate() posicional del SVG. */}
+      <g transform="translate(20 240)">
+        <g className="animate-pop" style={{ animationDelay: "1s" }}>
+          <rect width="118" height="72" rx="16" fill="var(--color-card)" stroke="var(--color-border)" />
+          <circle cx="26" cy="26" r="14" fill="var(--color-success)" opacity="0.18" />
+          <path d="M19 26 l5 5 l11 -11" fill="none" stroke="var(--color-success)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="48" y="18" width="54" height="8" rx="4" fill="var(--color-foreground)" opacity="0.5" />
+          <rect x="48" y="32" width="38" height="7" rx="3.5" fill="var(--color-foreground)" opacity="0.25" />
+          <rect x="19" y="48" width="83" height="7" rx="3.5" fill="var(--color-foreground)" opacity="0.15" />
+        </g>
       </g>
 
       {/* insignia: moneda Bs, flota suavemente */}
-      <g className="animate-float" transform="translate(352 44)">
-        <circle cx="34" cy="34" r="34" fill="var(--color-primary)" />
-        <circle cx="34" cy="34" r="34" fill="none" stroke="var(--color-card)" strokeWidth="3" />
-        <text x="34" y="42" textAnchor="middle" fontSize="22" fontWeight="700" fill="var(--color-primary-foreground)" fontFamily="ui-serif, Georgia, serif" fontStyle="italic">
-          Bs
-        </text>
+      <g transform="translate(352 44)">
+        <g className="animate-float">
+          <circle cx="34" cy="34" r="34" fill="var(--color-primary)" />
+          <circle cx="34" cy="34" r="34" fill="none" stroke="var(--color-card)" strokeWidth="3" />
+          <text x="34" y="42" textAnchor="middle" fontSize="22" fontWeight="700" fill="var(--color-primary-foreground)" fontFamily="ui-serif, Georgia, serif" fontStyle="italic">
+            Bs
+          </text>
+        </g>
       </g>
 
       {/* maceta con planta creciendo: negocio que crece, se mece */}
-      <g className="animate-sway" transform="translate(346 268)">
-        <path d="M6 46 L58 46 L50 78 L14 78 Z" fill="var(--color-primary)" opacity="0.85" />
-        <rect x="0" y="36" width="64" height="12" rx="6" fill="var(--color-primary)" />
-        <path d="M32 36 C32 10 14 6 8 -8" fill="none" stroke="var(--color-success)" strokeWidth="5" strokeLinecap="round" />
-        <path d="M32 36 C32 6 50 2 56 -14" fill="none" stroke="var(--color-success)" strokeWidth="5" strokeLinecap="round" />
-        <path d="M32 36 C31 16 32 4 32 -18" fill="none" stroke="var(--color-success)" strokeWidth="5" strokeLinecap="round" />
-        <ellipse cx="8" cy="-10" rx="9" ry="6" fill="var(--color-success)" transform="rotate(-30 8 -10)" />
-        <ellipse cx="56" cy="-16" rx="9" ry="6" fill="var(--color-success)" transform="rotate(25 56 -16)" />
-        <ellipse cx="32" cy="-22" rx="8" ry="10" fill="var(--color-success)" opacity="0.9" />
+      <g transform="translate(346 268)">
+        <g className="animate-sway">
+          <path d="M6 46 L58 46 L50 78 L14 78 Z" fill="var(--color-primary)" opacity="0.85" />
+          <rect x="0" y="36" width="64" height="12" rx="6" fill="var(--color-primary)" />
+          <path d="M32 36 C32 10 14 6 8 -8" fill="none" stroke="var(--color-success)" strokeWidth="5" strokeLinecap="round" />
+          <path d="M32 36 C32 6 50 2 56 -14" fill="none" stroke="var(--color-success)" strokeWidth="5" strokeLinecap="round" />
+          <path d="M32 36 C31 16 32 4 32 -18" fill="none" stroke="var(--color-success)" strokeWidth="5" strokeLinecap="round" />
+          <ellipse cx="8" cy="-10" rx="9" ry="6" fill="var(--color-success)" transform="rotate(-30 8 -10)" />
+          <ellipse cx="56" cy="-16" rx="9" ry="6" fill="var(--color-success)" transform="rotate(25 56 -16)" />
+          <ellipse cx="32" cy="-22" rx="8" ry="10" fill="var(--color-success)" opacity="0.9" />
+        </g>
       </g>
 
       {/* chispas decorativas */}
