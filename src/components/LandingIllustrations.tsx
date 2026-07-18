@@ -30,18 +30,18 @@ export function HeroIllustration() {
         <rect x="98" y="130" width="150" height="14" rx="4" fill="var(--color-foreground)" opacity="0.15" />
         <rect x="98" y="150" width="110" height="22" rx="5" fill="var(--color-foreground)" opacity="0.75" />
 
-        {/* barras del gráfico (mismo lenguaje visual que el Panel real) */}
-        <rect x="98" y="270" width="34" height="46" rx="7" fill="var(--color-warning)" opacity="0.7" />
-        <rect x="142" y="240" width="34" height="76" rx="7" fill="#e0574a" opacity="0.55" />
-        <rect x="186" y="200" width="34" height="116" rx="7" fill="var(--color-success)" opacity="0.75" />
-        <rect x="230" y="222" width="34" height="94" rx="7" fill="var(--color-primary)" opacity="0.85" />
-        <rect x="274" y="188" width="34" height="128" rx="7" fill="var(--color-success)" />
+        {/* barras del gráfico (mismo lenguaje visual que el Panel real), crecen al aparecer */}
+        <rect className="bar-grow" style={{ animationDelay: "0.5s" }} x="98" y="270" width="34" height="46" rx="7" fill="var(--color-warning)" opacity="0.7" />
+        <rect className="bar-grow" style={{ animationDelay: "0.6s" }} x="142" y="240" width="34" height="76" rx="7" fill="#e0574a" opacity="0.55" />
+        <rect className="bar-grow" style={{ animationDelay: "0.7s" }} x="186" y="200" width="34" height="116" rx="7" fill="var(--color-success)" opacity="0.75" />
+        <rect className="bar-grow" style={{ animationDelay: "0.8s" }} x="230" y="222" width="34" height="94" rx="7" fill="var(--color-primary)" opacity="0.85" />
+        <rect className="bar-grow" style={{ animationDelay: "0.9s" }} x="274" y="188" width="34" height="128" rx="7" fill="var(--color-success)" />
 
         <line x1="90" y1="316" x2="336" y2="316" stroke="var(--color-border)" strokeWidth="1.5" />
       </g>
 
       {/* insignia: factura con IVA calculado */}
-      <g transform="translate(20 240)">
+      <g className="animate-pop" style={{ animationDelay: "1s" }} transform="translate(20 240)">
         <rect width="118" height="72" rx="16" fill="var(--color-card)" stroke="var(--color-border)" />
         <circle cx="26" cy="26" r="14" fill="var(--color-success)" opacity="0.18" />
         <path d="M19 26 l5 5 l11 -11" fill="none" stroke="var(--color-success)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -50,8 +50,8 @@ export function HeroIllustration() {
         <rect x="19" y="48" width="83" height="7" rx="3.5" fill="var(--color-foreground)" opacity="0.15" />
       </g>
 
-      {/* insignia: moneda Bs */}
-      <g transform="translate(352 44)">
+      {/* insignia: moneda Bs, flota suavemente */}
+      <g className="animate-float" transform="translate(352 44)">
         <circle cx="34" cy="34" r="34" fill="var(--color-primary)" />
         <circle cx="34" cy="34" r="34" fill="none" stroke="var(--color-card)" strokeWidth="3" />
         <text x="34" y="42" textAnchor="middle" fontSize="22" fontWeight="700" fill="var(--color-primary-foreground)" fontFamily="ui-serif, Georgia, serif" fontStyle="italic">
@@ -59,8 +59,8 @@ export function HeroIllustration() {
         </text>
       </g>
 
-      {/* maceta con planta creciendo: negocio que crece */}
-      <g transform="translate(346 268)">
+      {/* maceta con planta creciendo: negocio que crece, se mece */}
+      <g className="animate-sway" transform="translate(346 268)">
         <path d="M6 46 L58 46 L50 78 L14 78 Z" fill="var(--color-primary)" opacity="0.85" />
         <rect x="0" y="36" width="64" height="12" rx="6" fill="var(--color-primary)" />
         <path d="M32 36 C32 10 14 6 8 -8" fill="none" stroke="var(--color-success)" strokeWidth="5" strokeLinecap="round" />
@@ -72,9 +72,87 @@ export function HeroIllustration() {
       </g>
 
       {/* chispas decorativas */}
-      <circle cx="60" cy="90" r="4" fill="var(--color-primary)" opacity="0.4" />
-      <circle cx="410" cy="200" r="5" fill="var(--color-success)" opacity="0.4" />
-      <circle cx="130" cy="60" r="3" fill="var(--color-primary)" opacity="0.5" />
+      <circle className="animate-float" style={{ animationDelay: "0.3s" }} cx="60" cy="90" r="4" fill="var(--color-primary)" opacity="0.4" />
+      <circle className="animate-float" style={{ animationDelay: "1.2s" }} cx="410" cy="200" r="5" fill="var(--color-success)" opacity="0.4" />
+      <circle className="animate-float" style={{ animationDelay: "0.8s" }} cx="130" cy="60" r="3" fill="var(--color-primary)" opacity="0.5" />
+    </svg>
+  );
+}
+
+export function ReceiptIllustration() {
+  return (
+    <svg viewBox="0 0 120 120" className="size-14" aria-hidden>
+      <path
+        d="M28 12 h64 v92 l-10 -8 -10 8 -10 -8 -10 8 -10 -8 -10 8 -10 -8 -4 8 Z"
+        fill="var(--color-primary)"
+        opacity="0.12"
+      />
+      <path
+        d="M28 12 h64 v92 l-10 -8 -10 8 -10 -8 -10 8 -10 -8 -10 8 -4 -8 Z"
+        fill="none"
+        stroke="var(--color-primary)"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <line x1="42" y1="34" x2="78" y2="34" stroke="var(--color-primary)" strokeWidth="4" strokeLinecap="round" opacity="0.55" />
+      <line x1="42" y1="48" x2="78" y2="48" stroke="var(--color-primary)" strokeWidth="4" strokeLinecap="round" opacity="0.35" />
+      <line x1="42" y1="62" x2="64" y2="62" stroke="var(--color-primary)" strokeWidth="4" strokeLinecap="round" opacity="0.35" />
+      <circle cx="86" cy="78" r="20" fill="var(--color-success)" />
+      <path d="M77 78 l6 6 12 -13" fill="none" stroke="var(--color-success-foreground)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function MagnifierChartIllustration() {
+  return (
+    <svg viewBox="0 0 120 120" className="size-14" aria-hidden>
+      <rect x="18" y="70" width="14" height="30" rx="4" fill="var(--color-warning)" opacity="0.65" />
+      <rect x="38" y="52" width="14" height="48" rx="4" fill="var(--color-success)" opacity="0.8" />
+      <rect x="58" y="34" width="14" height="66" rx="4" fill="var(--color-primary)" />
+      <circle cx="82" cy="42" r="26" fill="none" stroke="var(--color-primary)" strokeWidth="5" />
+      <line x1="100" y1="60" x2="114" y2="74" stroke="var(--color-primary)" strokeWidth="6" strokeLinecap="round" />
+      <path d="M70 46 l8 -10 6 6 12 -14" fill="none" stroke="var(--color-success)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function ShopfrontsIllustration() {
+  return (
+    <svg viewBox="0 0 120 120" className="size-14" aria-hidden>
+      <rect x="10" y="52" width="34" height="48" rx="4" fill="var(--color-primary)" opacity="0.85" />
+      <path d="M6 52 L44 52 L40 34 L10 34 Z" fill="var(--color-warning)" />
+      <rect x="20" y="72" width="14" height="28" fill="var(--color-card)" opacity="0.85" />
+
+      <rect x="50" y="40" width="34" height="60" rx="4" fill="var(--color-success)" opacity="0.85" />
+      <path d="M46 40 L84 40 L80 22 L50 22 Z" fill="var(--color-primary)" />
+      <rect x="60" y="62" width="14" height="38" fill="var(--color-card)" opacity="0.85" />
+
+      <rect x="88" y="58" width="26" height="42" rx="4" fill="var(--color-warning)" opacity="0.7" />
+      <path d="M85 58 L114 58 L111 44 L89 44 Z" fill="var(--color-success)" />
+    </svg>
+  );
+}
+
+export function GrowthIllustration() {
+  return (
+    <svg viewBox="0 0 220 200" className="mx-auto w-full max-w-[220px]" aria-hidden>
+      <ellipse cx="110" cy="176" rx="70" ry="10" fill="var(--color-foreground)" opacity="0.06" />
+      <g className="animate-sway">
+        <path d="M78 150 L146 150 L136 176 L88 176 Z" fill="var(--color-primary)" opacity="0.9" />
+        <rect x="70" y="136" width="84" height="16" rx="8" fill="var(--color-primary)" />
+        <path d="M112 136 C112 88 74 76 54 40" fill="none" stroke="var(--color-success)" strokeWidth="7" strokeLinecap="round" />
+        <path d="M112 136 C112 84 156 68 174 30" fill="none" stroke="var(--color-success)" strokeWidth="7" strokeLinecap="round" />
+        <path d="M112 136 C110 92 112 60 112 20" fill="none" stroke="var(--color-success)" strokeWidth="7" strokeLinecap="round" />
+        <ellipse cx="54" cy="36" rx="15" ry="10" fill="var(--color-success)" transform="rotate(-25 54 36)" />
+        <ellipse cx="174" cy="26" rx="15" ry="10" fill="var(--color-success)" transform="rotate(20 174 26)" />
+        <ellipse cx="112" cy="16" rx="13" ry="17" fill="var(--color-success)" opacity="0.92" />
+      </g>
+      <g className="animate-float" style={{ animationDelay: "0.4s" }}>
+        <circle cx="176" cy="120" r="18" fill="var(--color-primary)" />
+        <text x="176" y="126" textAnchor="middle" fontSize="14" fontWeight="700" fill="var(--color-primary-foreground)" fontFamily="ui-serif, Georgia, serif" fontStyle="italic">
+          Bs
+        </text>
+      </g>
     </svg>
   );
 }

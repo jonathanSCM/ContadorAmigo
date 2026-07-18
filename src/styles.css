@@ -125,3 +125,40 @@
 .animate-reveal {
   animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+@keyframes draw-bar {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-float {
+  animation: float-y 4s ease-in-out infinite;
+}
+.animate-sway {
+  animation: sway 3.2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+.bar-grow {
+  transform-origin: bottom;
+  animation: draw-bar 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-pop {
+  animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float, .animate-sway, .bar-grow, .animate-pop, .animate-reveal {
+    animation: none !important;
+  }
+}

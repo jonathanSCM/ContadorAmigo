@@ -1,19 +1,23 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { getCurrentUser } from "@/lib/auth.server";
-import { HeroIllustration, MessyBooksIllustration } from "@/components/LandingIllustrations";
 import {
-  Building2,
+  GrowthIllustration,
+  HeroIllustration,
+  MagnifierChartIllustration,
+  MessyBooksIllustration,
+  ReceiptIllustration,
+  ShopfrontsIllustration,
+} from "@/components/LandingIllustrations";
+import {
   CheckCircle2,
   Frown,
   HandCoins,
   HeartHandshake,
   Lightbulb,
   Palette,
-  Receipt,
   ShieldCheck,
   Sparkles,
   Target,
-  TrendingUp,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -42,17 +46,17 @@ const PROBLEMS = [
 
 const FEATURES = [
   {
-    icon: Receipt,
+    illustration: ReceiptIllustration,
     title: "Impuestos del SIN",
     body: "Calcula IVA, IT, IUE y te decimos qué régimen te conviene (RTS, SIETE-RG o General), con tu Cierre de Gestión real según tu rubro.",
   },
   {
-    icon: TrendingUp,
+    illustration: MagnifierChartIllustration,
     title: "Decisiones claras",
     body: "Precio justo, punto de equilibrio, estado de resultados y la salud de tu negocio, explicados en lenguaje simple y con colores.",
   },
   {
-    icon: Building2,
+    illustration: ShopfrontsIllustration,
     title: "Multi-negocio",
     body: "Maneja varios emprendimientos desde una sola cuenta, cada uno con sus propios datos, seguros y privados.",
   },
@@ -205,8 +209,8 @@ function Landing() {
               className="animate-reveal group rounded-3xl bg-card p-7 ring-1 ring-black/5 transition-shadow hover:shadow-xl hover:shadow-black/5"
               style={{ animationDelay: `${i * 0.08}s` }}
             >
-              <div className="mb-4 grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                <f.icon className="size-6" />
+              <div className="mb-4 grid size-16 place-items-center rounded-2xl bg-primary/5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-105">
+                <f.illustration />
               </div>
               <h3 className="mb-2 font-serif text-xl italic">{f.title}</h3>
               <p className="text-sm leading-relaxed text-foreground/60">{f.body}</p>
@@ -328,6 +332,7 @@ function Landing() {
           style={{ background: "radial-gradient(closest-side, var(--color-primary), transparent)" }}
         />
         <div className="relative mx-auto max-w-3xl px-4 pb-24 text-center sm:px-6">
+          <GrowthIllustration />
           <h2 className="font-serif text-3xl italic sm:text-4xl">¿Listo para ordenar tu negocio?</h2>
           <p className="mt-3 text-foreground/60">Gratis. Sin tarjeta. Empiezas en minutos.</p>
           <Link
