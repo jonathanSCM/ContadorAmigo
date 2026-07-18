@@ -166,6 +166,76 @@ export function GrowthIllustration() {
   );
 }
 
+export function CompassIllustration() {
+  return (
+    <svg viewBox="0 0 160 160" className="w-full max-w-[150px]" aria-hidden>
+      <circle cx="80" cy="80" r="64" fill="var(--color-card)" stroke="var(--color-border)" strokeWidth="2" />
+      <circle cx="80" cy="80" r="50" fill="none" stroke="var(--color-primary)" strokeWidth="2" opacity="0.25" />
+      <line x1="80" y1="20" x2="80" y2="32" stroke="var(--color-primary)" strokeWidth="3" strokeLinecap="round" />
+      <line x1="80" y1="128" x2="80" y2="140" stroke="var(--color-primary)" strokeWidth="3" strokeLinecap="round" opacity="0.4" />
+      <line x1="20" y1="80" x2="32" y2="80" stroke="var(--color-primary)" strokeWidth="3" strokeLinecap="round" opacity="0.4" />
+      <line x1="128" y1="80" x2="140" y2="80" stroke="var(--color-primary)" strokeWidth="3" strokeLinecap="round" opacity="0.4" />
+      <g className="animate-sway" style={{ transformOrigin: "80px 80px" }}>
+        <path d="M80 40 L92 80 L80 120 L68 80 Z" fill="var(--color-primary)" />
+        <path d="M80 40 L92 80 L80 80 Z" fill="var(--color-primary)" />
+        <path d="M80 120 L68 80 L80 80 Z" fill="var(--color-primary-foreground)" opacity="0.3" />
+      </g>
+      <circle cx="80" cy="80" r="6" fill="var(--color-card)" stroke="var(--color-primary)" strokeWidth="2" />
+    </svg>
+  );
+}
+
+export function PeakFlagIllustration() {
+  return (
+    <svg viewBox="0 0 220 170" className="w-full max-w-[220px]" aria-hidden>
+      <circle cx="172" cy="38" r="20" fill="var(--color-accent)" opacity="0.55" />
+      <path d="M20 150 L80 60 L112 100 L140 66 L200 150 Z" fill="var(--color-primary)" opacity="0.28" />
+      <path d="M60 150 L118 44 L176 150 Z" fill="var(--color-primary)" opacity="0.9" />
+      <path d="M118 44 L138 78 L98 78 Z" fill="var(--color-card)" opacity="0.9" />
+      <path
+        className="animate-float"
+        d="M118 44 L118 16 L146 26 L118 36 Z"
+        fill="var(--color-warning)"
+        style={{ transformOrigin: "118px 44px" }}
+      />
+      <line x1="118" y1="16" x2="118" y2="44" stroke="var(--color-foreground)" strokeWidth="2.5" opacity="0.55" />
+      <path d="M40 150 C64 118 88 108 118 108 C148 108 168 128 188 150" fill="none" stroke="var(--color-success)" strokeWidth="3" strokeDasharray="2 8" strokeLinecap="round" opacity="0.6" />
+    </svg>
+  );
+}
+
+export function PathIllustration() {
+  return (
+    <svg viewBox="0 0 320 120" className="mx-auto w-full max-w-lg" aria-hidden>
+      <path
+        d="M12 96 C 70 96, 70 30, 118 30 S 166 96, 214 96 S 262 30, 308 30"
+        fill="none"
+        stroke="var(--color-border)"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeDasharray="1 14"
+      />
+      {[
+        { x: 12, y: 96 },
+        { x: 118, y: 30 },
+        { x: 214, y: 96 },
+        { x: 308, y: 30 },
+      ].map((p, i) => (
+        <g key={i} className="animate-pop" style={{ animationDelay: `${0.15 * i}s` }}>
+          <circle cx={p.x} cy={p.y} r="11" fill={i === 3 ? "var(--color-success)" : "var(--color-primary)"} />
+          <text x={p.x} y={p.y + 4} textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--color-primary-foreground)">
+            {i + 1}
+          </text>
+        </g>
+      ))}
+      <g transform="translate(308 12)">
+        <line x1="0" y1="0" x2="0" y2="18" stroke="var(--color-foreground)" strokeWidth="2" opacity="0.5" />
+        <path d="M0 0 L18 4 L0 9 Z" fill="var(--color-success)" />
+      </g>
+    </svg>
+  );
+}
+
 export function MessyBooksIllustration() {
   return (
     <svg viewBox="0 0 240 220" className="mx-auto w-full max-w-[220px]" aria-hidden>

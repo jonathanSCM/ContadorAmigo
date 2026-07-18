@@ -1,10 +1,13 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { getCurrentUser } from "@/lib/auth.server";
 import {
+  CompassIllustration,
   GrowthIllustration,
   HeroIllustration,
   MagnifierChartIllustration,
   MessyBooksIllustration,
+  PathIllustration,
+  PeakFlagIllustration,
   ReceiptIllustration,
   ShopfrontsIllustration,
 } from "@/components/LandingIllustrations";
@@ -17,7 +20,6 @@ import {
   Palette,
   ShieldCheck,
   Sparkles,
-  Target,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -222,24 +224,29 @@ function Landing() {
 
       {/* Misión */}
       <section className="border-y border-border bg-card">
-        <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
-          <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-primary">
-            Nuestra misión
-          </p>
-          <p className="font-serif text-2xl italic leading-relaxed sm:text-3xl">
-            "En ContadorAmigo ayudamos a los emprendedores y pequeños negocios de Bolivia a
-            entender y controlar las finanzas e impuestos de su emprendimiento, a través de una
-            plataforma digital visual, sencilla y explicativa que traduce la contabilidad a un
-            lenguaje claro."
-          </p>
+        <div className="mx-auto grid max-w-4xl grid-cols-1 items-center gap-8 px-4 py-20 sm:px-6 lg:grid-cols-[auto_1fr] lg:text-left">
+          <div className="flex justify-center">
+            <CompassIllustration />
+          </div>
+          <div className="text-center lg:text-left">
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-primary">
+              Nuestra misión
+            </p>
+            <p className="font-serif text-2xl italic leading-relaxed sm:text-3xl">
+              "En ContadorAmigo ayudamos a los emprendedores y pequeños negocios de Bolivia a
+              entender y controlar las finanzas e impuestos de su emprendimiento, a través de una
+              plataforma digital visual, sencilla y explicativa que traduce la contabilidad a un
+              lenguaje claro."
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Visión */}
       <section className="mx-auto max-w-5xl px-4 py-20 sm:px-6">
         <div className="grid grid-cols-1 gap-8 rounded-3xl bg-primary/5 p-8 ring-1 ring-primary/10 sm:p-12 lg:grid-cols-[auto_1fr] lg:items-center">
-          <div className="grid size-16 shrink-0 place-items-center rounded-2xl bg-primary text-primary-foreground">
-            <Target className="size-8" />
+          <div className="flex justify-center">
+            <PeakFlagIllustration />
           </div>
           <div>
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-primary">
@@ -289,6 +296,9 @@ function Landing() {
             Nuestro camino
           </p>
           <h2 className="font-serif text-3xl italic sm:text-4xl">Entender · Controlar · Formalizar · Crecer</h2>
+        </div>
+        <div className="mb-6 hidden sm:block">
+          <PathIllustration />
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {PILLARS.map((p, i) => (
