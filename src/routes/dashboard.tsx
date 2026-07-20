@@ -13,6 +13,7 @@ import {
 } from "@/lib/businesses.server";
 import { formatBs } from "@/lib/tax";
 import { SECTOR_INFO, type Sector } from "@/lib/sectors";
+import { LogoMark } from "@/components/Logo";
 import { Building2, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
@@ -45,7 +46,7 @@ function Dashboard() {
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="ContadorAmigo" className="size-8" />
+            <LogoMark className="size-8" />
             <span className="font-serif text-lg italic font-semibold">ContadorAmigo</span>
           </Link>
           <div className="flex items-center gap-3">

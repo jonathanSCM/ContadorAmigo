@@ -2,6 +2,7 @@ import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-ro
 import { useState } from "react";
 import { toast } from "sonner";
 import { getCurrentUser, loginUser } from "@/lib/auth.server";
+import { LogoMark } from "@/components/Logo";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
@@ -36,7 +37,7 @@ function Login() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <Link to="/" className="mb-8 flex items-center justify-center gap-2.5">
-          <img src="/logo.png" alt="ContadorAmigo" className="size-9" />
+          <LogoMark className="size-9" />
           <span className="font-serif text-xl italic font-semibold tracking-tight">
             ContadorAmigo
           </span>

@@ -6,6 +6,7 @@ import { updateBusiness, type BusinessRow } from "@/lib/businesses.server";
 import { listMovements } from "@/lib/movements.server";
 import { calcMonthly, healthStatus } from "@/lib/tax";
 import { BusinessSwitcher } from "@/components/BusinessSwitcher";
+import { LogoMark } from "@/components/Logo";
 import { Onboarding } from "@/components/Onboarding";
 import { LogOut, Moon, Sun } from "lucide-react";
 
@@ -81,7 +82,7 @@ export function AppShell({ children, business }: { children: ReactNode; business
       <nav className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:gap-6 sm:px-6 sm:py-4">
           <Link to="/dashboard" className="flex min-w-0 items-center gap-2 sm:gap-3">
-            <img src="/logo.png" alt="ContadorAmigo" className="size-8 shrink-0 sm:size-9" />
+            <LogoMark className="size-8 shrink-0 sm:size-9" />
             <span className="truncate font-serif text-lg italic font-semibold tracking-tight sm:text-xl">
               ContadorAmigo
             </span>
