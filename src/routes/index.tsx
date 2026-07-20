@@ -5,6 +5,7 @@ import {
   GrowthIllustration,
   HeroIllustration,
   MagnifierChartIllustration,
+  LogoMark,
   MessyBooksIllustration,
   PathIllustration,
   PeakFlagIllustration,
@@ -86,7 +87,7 @@ function Landing() {
       <nav className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:px-6 sm:py-4">
           <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
-            <img src="/logo.png" alt="ContadorAmigo" className="size-8 shrink-0 sm:size-9" />
+            <LogoMark className="size-8 shrink-0 sm:size-9" />
             <span className="truncate font-serif text-base italic font-semibold tracking-tight sm:text-xl">
               ContadorAmigo
             </span>
@@ -113,8 +114,8 @@ function Landing() {
       <header className="relative overflow-hidden">
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-32 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full opacity-[0.15] blur-3xl"
-          style={{ background: "radial-gradient(closest-side, var(--color-primary), transparent)" }}
+          className="pointer-events-none absolute -top-32 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full opacity-[0.22] blur-3xl"
+          style={{ background: "radial-gradient(closest-side, var(--color-primary), var(--color-accent), transparent)" }}
         />
         <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6 lg:text-left">
           <div className="text-center lg:text-left">
@@ -339,8 +340,8 @@ function Landing() {
       <section className="relative overflow-hidden">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.08]"
-          style={{ background: "radial-gradient(closest-side, var(--color-primary), transparent)" }}
+          className="pointer-events-none absolute inset-0 opacity-[0.14]"
+          style={{ background: "radial-gradient(closest-side, var(--color-primary), var(--color-accent), transparent)" }}
         />
         <div className="relative mx-auto max-w-3xl px-4 pb-24 text-center sm:px-6">
           <GrowthIllustration />
