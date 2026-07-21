@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ConceptPopover } from "@/components/ConceptPopover";
 import { listMovements } from "@/lib/movements.server";
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/negocio/$businessId/")({
 
 function Index() {
   const { businessId } = Route.useParams();
-  const { business } = useRouteContext({ from: "/negocio/$businessId" });
+  const { business } = useLoaderData({ from: "/negocio/$businessId" });
   const [movs, setMovs] = useState<Movement[]>([]);
   const [conceptIdx, setConceptIdx] = useState(0);
 

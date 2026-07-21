@@ -34,10 +34,13 @@ export function AppShell({ children, business }: { children: ReactNode; business
   }, [business.id, business.nit]);
 
   useEffect(() => {
+    // Solo al cambiar de negocio, no en cada navegación entre pestañas: antes
+    // esto traía TODOS los movimientos del negocio en cada clic del menú,
+    // que era la causa principal de la lentitud al cambiar de apartado.
     listMovements({ data: business.id }).then((rows) => {
       setHealth(healthStatus(calcMonthly(rows)));
     });
-  }, [business.id, pathname]);
+  }, [business.id]);
 
   useEffect(() => {
     const isDark = localStorage.getItem("contadoramigo:theme") === "dark";
@@ -79,10 +82,10 @@ export function AppShell({ children, business }: { children: ReactNode; business
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
       <Onboarding />
-      <nav className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
+      <nav className="sticky top-0 z-50 border-b border-border bg-background/85 shadow-sm shadow-black/[0.03] backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:gap-6 sm:px-6 sm:py-4">
           <Link to="/dashboard" className="flex min-w-0 items-center gap-2 sm:gap-3">
-            <LogoMark className="size-8 shrink-0 sm:size-9" />
+            <LogoMark className="size-8 shrink-0 drop-shadow-sm sm:size-9" />
             <span className="truncate font-serif text-lg italic font-semibold tracking-tight sm:text-xl">
               ContadorAmigo
             </span>
@@ -97,10 +100,10 @@ export function AppShell({ children, business }: { children: ReactNode; business
                   key={n.to}
                   to={n.to}
                   params={{ businessId: business.id }}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                     active
-                      ? "bg-foreground text-background"
-                      : "text-foreground/60 hover:text-foreground"
+                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/30"
+                      : "text-foreground/60 hover:bg-secondary/60 hover:text-foreground"
                   }`}
                 >
                   {n.label}
@@ -114,7 +117,7 @@ export function AppShell({ children, business }: { children: ReactNode; business
               onClick={toggleTheme}
               aria-label="Cambiar tema claro/oscuro"
               title="Cambiar tema"
-              className="grid size-8 shrink-0 place-items-center rounded-full border border-border text-foreground/70 transition-colors hover:text-foreground"
+              className="grid size-8 shrink-0 place-items-center rounded-full border border-border text-foreground/70 transition-colors hover:border-primary/40 hover:text-primary"
             >
               {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </button>
@@ -129,7 +132,7 @@ export function AppShell({ children, business }: { children: ReactNode; business
               <div
                 className={`hidden items-center gap-2 rounded-full px-3 py-1 text-xs font-bold sm:flex ${healthBg}`}
               >
-                <span className={`size-2 animate-pulse rounded-full ${dotColor}`} />
+                <span className={`size-2 rounded-full ${dotColor} shadow-[0_0_0_3px_currentColor] shadow-current/20`} />
                 {health.label}
               </div>
             )}
@@ -137,7 +140,7 @@ export function AppShell({ children, business }: { children: ReactNode; business
               onClick={doLogout}
               aria-label="Cerrar sesión"
               title="Cerrar sesión"
-              className="hidden size-8 place-items-center rounded-full border border-border text-foreground/50 transition-colors hover:text-danger sm:grid"
+              className="hidden size-8 place-items-center rounded-full border border-border text-foreground/50 transition-colors hover:border-danger/40 hover:text-danger sm:grid"
             >
               <LogOut className="size-4" />
             </button>
@@ -153,8 +156,8 @@ export function AppShell({ children, business }: { children: ReactNode; business
                 key={n.to}
                 to={n.to}
                 params={{ businessId: business.id }}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium ${
-                  active ? "bg-foreground text-background" : "text-foreground/60"
+                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                  active ? "bg-primary text-primary-foreground" : "text-foreground/60 hover:bg-secondary/60"
                 }`}
               >
                 {n.label}

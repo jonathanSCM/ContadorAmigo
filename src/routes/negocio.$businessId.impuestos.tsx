@@ -1,4 +1,4 @@
-import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { ConceptPopover } from "@/components/ConceptPopover";
 import { listMovements } from "@/lib/movements.server";
@@ -47,7 +47,7 @@ const fmtDate = (d: Date) =>
 
 function Impuestos() {
   const { businessId } = Route.useParams();
-  const { business } = useRouteContext({ from: "/negocio/$businessId" });
+  const { business } = useLoaderData({ from: "/negocio/$businessId" });
   const [movs, setMovs] = useState<Movement[]>([]);
   const [capital, setCapital] = useState("22000");
   const [period, setPeriod] = useState<Period | "custom">("mes");

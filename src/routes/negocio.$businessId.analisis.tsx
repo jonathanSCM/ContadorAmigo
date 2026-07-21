@@ -1,4 +1,4 @@
-import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ConceptPopover } from "@/components/ConceptPopover";
@@ -31,7 +31,7 @@ const PERIODOS: { id: Period; label: string }[] = [
 
 function Analisis() {
   const { businessId } = Route.useParams();
-  const { business } = useRouteContext({ from: "/negocio/$businessId" });
+  const { business } = useLoaderData({ from: "/negocio/$businessId" });
   const [movs, setMovs] = useState<Movement[]>([]);
   const [period, setPeriod] = useState<Period>("anio");
   const [savingsLabel, setSavingsLabel] = useState(business.savingsLabel);
