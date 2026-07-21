@@ -119,7 +119,7 @@ export function AppShell({ children, business }: { children: ReactNode; business
               onClick={doLogout}
               aria-label="Cerrar sesión"
               title="Cerrar sesión"
-              className="hidden size-8 shrink-0 place-items-center rounded-full border border-border text-foreground/50 transition-colors hover:border-danger/40 hover:text-danger sm:grid"
+              className="grid size-8 shrink-0 place-items-center rounded-full border border-border text-foreground/50 transition-colors hover:border-danger/40 hover:text-danger"
             >
               <LogOut className="size-4" />
             </button>

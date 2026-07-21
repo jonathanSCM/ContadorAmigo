@@ -90,31 +90,41 @@ function Facturacion() {
 
           <div className="space-y-2">
             {lines.map((l) => (
-              <div key={l.id} className="grid grid-cols-2 items-center gap-2 sm:grid-cols-12">
+              <div key={l.id} className="grid grid-cols-2 items-end gap-2 sm:grid-cols-12">
                 <input
                   value={l.detail}
                   onChange={(e) => update(l.id, { detail: e.target.value })}
                   placeholder="Detalle del producto o servicio"
                   className="col-span-2 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none sm:col-span-6"
                 />
-                <input
-                  inputMode="numeric"
-                  type="number"
-                  min={0}
-                  value={l.qty}
-                  onChange={(e) => update(l.id, { qty: parseFloat(e.target.value) || 0 })}
-                  placeholder="Cant."
-                  className="col-span-1 rounded-lg border border-border bg-background px-3 py-2 text-right text-sm focus:border-primary focus:outline-none sm:col-span-2"
-                />
-                <input
-                  inputMode="decimal"
-                  type="number"
-                  min={0}
-                  value={l.price}
-                  onChange={(e) => update(l.id, { price: parseFloat(e.target.value) || 0 })}
-                  placeholder="P. Unit."
-                  className="col-span-1 rounded-lg border border-border bg-background px-3 py-2 text-right text-sm font-bold focus:border-primary focus:outline-none sm:col-span-3"
-                />
+                <div className="sm:col-span-2">
+                  <label className="mb-1 block text-[9px] font-bold uppercase tracking-widest text-foreground/40 sm:hidden">
+                    Cantidad
+                  </label>
+                  <input
+                    inputMode="numeric"
+                    type="number"
+                    min={0}
+                    value={l.qty}
+                    onChange={(e) => update(l.id, { qty: parseFloat(e.target.value) || 0 })}
+                    placeholder="Cant."
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-right text-sm focus:border-primary focus:outline-none"
+                  />
+                </div>
+                <div className="sm:col-span-3">
+                  <label className="mb-1 block text-[9px] font-bold uppercase tracking-widest text-foreground/40 sm:hidden">
+                    Precio unit. (Bs)
+                  </label>
+                  <input
+                    inputMode="decimal"
+                    type="number"
+                    min={0}
+                    value={l.price}
+                    onChange={(e) => update(l.id, { price: parseFloat(e.target.value) || 0 })}
+                    placeholder="P. Unit."
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-right text-sm font-bold focus:border-primary focus:outline-none"
+                  />
+                </div>
                 <button
                   onClick={() => removeLine(l.id)}
                   className="col-span-2 grid place-items-center rounded-lg border border-dashed border-border p-2 text-foreground/30 hover:bg-danger/10 hover:text-danger sm:col-span-1 sm:border-none"
