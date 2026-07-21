@@ -22,6 +22,7 @@ export function AppShell({ children, business }: { children: ReactNode; business
     { to: "/negocio/$businessId/impuestos", label: "Impuestos" },
     { to: "/negocio/$businessId/balance", label: "Balance" },
     { to: "/negocio/$businessId/facturacion", label: "Facturación" },
+    { to: "/negocio/$businessId/asistente", label: "Asistente" },
     { to: "/negocio/$businessId/aprender", label: "Aprender" },
   ] as const;
 
