@@ -5,6 +5,7 @@ import { logoutUser } from "@/lib/auth.server";
 import { updateBusiness, type BusinessRow } from "@/lib/businesses.server";
 import { listMovements } from "@/lib/movements.server";
 import { calcMonthly, healthStatus } from "@/lib/tax";
+import { AssistantWidget } from "@/components/AssistantWidget";
 import { BusinessSwitcher } from "@/components/BusinessSwitcher";
 import { LogoMark } from "@/components/Logo";
 import { Onboarding } from "@/components/Onboarding";
@@ -22,7 +23,6 @@ export function AppShell({ children, business }: { children: ReactNode; business
     { to: "/negocio/$businessId/impuestos", label: "Impuestos" },
     { to: "/negocio/$businessId/balance", label: "Balance" },
     { to: "/negocio/$businessId/facturacion", label: "Facturación" },
-    { to: "/negocio/$businessId/asistente", label: "Asistente" },
     { to: "/negocio/$businessId/aprender", label: "Aprender" },
   ] as const;
 
@@ -154,6 +154,8 @@ export function AppShell({ children, business }: { children: ReactNode; business
       </nav>
 
       {children}
+
+      <AssistantWidget businessId={business.id} businessName={business.name} />
 
       <footer className="mx-auto mt-12 flex max-w-7xl flex-col items-center gap-2 border-t border-border px-4 py-8 text-center text-xs text-foreground/40 sm:flex-row sm:justify-between sm:px-6 sm:text-left">
         <p>Diseñado para el emprendedor boliviano · {business.name}</p>
