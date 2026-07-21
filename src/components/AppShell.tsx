@@ -84,35 +84,14 @@ export function AppShell({ children, business }: { children: ReactNode; business
       <Onboarding />
       <nav className="sticky top-0 z-50 border-b border-border bg-background/85 shadow-sm shadow-black/[0.03] backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:gap-6 sm:px-6 sm:py-4">
-          <Link to="/dashboard" className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <Link to="/dashboard" className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
             <LogoMark className="size-8 shrink-0 drop-shadow-sm sm:size-9" />
-            <span className="truncate font-serif text-lg italic font-semibold tracking-tight sm:text-xl">
+            <span className="hidden truncate font-serif text-lg italic font-semibold tracking-tight sm:block sm:text-xl">
               ContadorAmigo
             </span>
           </Link>
 
-          <div className="hidden gap-1 xl:flex">
-            {NAV.map((n) => {
-              const resolved = n.to.replace("$businessId", business.id);
-              const active = n.to === "/negocio/$businessId" ? pathname === resolved : pathname.startsWith(resolved);
-              return (
-                <Link
-                  key={n.to}
-                  to={n.to}
-                  params={{ businessId: business.id }}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                    active
-                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/30"
-                      : "text-foreground/60 hover:bg-secondary/60 hover:text-foreground"
-                  }`}
-                >
-                  {n.label}
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
+          <div className="flex min-w-0 shrink items-center gap-1.5 sm:gap-3">
             <button
               onClick={toggleTheme}
               aria-label="Cambiar tema claro/oscuro"
@@ -126,7 +105,7 @@ export function AppShell({ children, business }: { children: ReactNode; business
               value={nit}
               onChange={(e) => saveNit(e.target.value)}
               placeholder="NIT"
-              className="hidden w-28 rounded-full border border-border bg-transparent px-3 py-1 text-xs font-medium placeholder:text-foreground/30 focus:border-primary/40 focus:outline-none xl:block"
+              className="hidden w-28 rounded-full border border-border bg-transparent px-3 py-1 text-xs font-medium placeholder:text-foreground/30 focus:border-primary/40 focus:outline-none lg:block"
             />
             {health && (
               <div
@@ -140,14 +119,18 @@ export function AppShell({ children, business }: { children: ReactNode; business
               onClick={doLogout}
               aria-label="Cerrar sesión"
               title="Cerrar sesión"
-              className="hidden size-8 place-items-center rounded-full border border-border text-foreground/50 transition-colors hover:border-danger/40 hover:text-danger sm:grid"
+              className="hidden size-8 shrink-0 place-items-center rounded-full border border-border text-foreground/50 transition-colors hover:border-danger/40 hover:text-danger sm:grid"
             >
               <LogOut className="size-4" />
             </button>
           </div>
         </div>
 
-        <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 pb-3 sm:px-6 xl:hidden">
+        {/* Barra de pestañas con scroll horizontal: nunca se rompe ni se
+            superpone con nada, sin importar cuántas pestañas o qué tan
+            ancha sea la pantalla — antes había además una fila fija para
+            pantallas grandes que no cabía junto al resto del header. */}
+        <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 pb-3 sm:px-6">
           {NAV.map((n) => {
             const resolved = n.to.replace("$businessId", business.id);
             const active = n.to === "/negocio/$businessId" ? pathname === resolved : pathname.startsWith(resolved);
@@ -156,8 +139,10 @@ export function AppShell({ children, business }: { children: ReactNode; business
                 key={n.to}
                 to={n.to}
                 params={{ businessId: business.id }}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                  active ? "bg-primary text-primary-foreground" : "text-foreground/60 hover:bg-secondary/60"
+                className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                  active
+                    ? "bg-primary text-primary-foreground shadow-sm shadow-primary/30"
+                    : "text-foreground/60 hover:bg-secondary/60 hover:text-foreground"
                 }`}
               >
                 {n.label}
