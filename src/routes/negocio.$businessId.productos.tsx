@@ -150,17 +150,45 @@ function Productos() {
                 <p className="font-bold">{formatBs(gainPerUnit)}</p>
               </div>
               <div>
-                <p className="text-xs opacity-70">Multiplicas el costo</p>
+                <p className="flex items-center gap-1 text-xs opacity-70">
+                  Multiplicas el costo
+                  <ConceptPopover conceptKey="markup" label="¿Qué es?" variant="on-primary" />
+                </p>
                 <p className="font-bold">{markup({ cost: costNum, price }).toFixed(2)}×</p>
               </div>
               <div>
-                <p className="text-xs opacity-70">Si facturas (con IVA)</p>
+                <p className="flex items-center gap-1 text-xs opacity-70">
+                  Si facturas (con IVA)
+                  <ConceptPopover conceptKey="precio-con-iva" label="¿Qué es?" variant="on-primary" />
+                </p>
                 <p className="font-bold">{formatBs(priceConFactura)}</p>
               </div>
               <div>
-                <p className="text-xs opacity-70">Margen real</p>
+                <p className="flex items-center gap-1 text-xs opacity-70">
+                  Margen real
+                  <ConceptPopover conceptKey="margen-real" label="¿Qué es?" variant="on-primary" />
+                </p>
                 <p className="font-bold">{(marginPct({ cost: costNum, price }) * 100).toFixed(0)}%</p>
               </div>
+            </div>
+
+            <div className="mt-4 space-y-1 rounded-xl bg-black/10 p-3 font-mono text-[11px] leading-relaxed opacity-90">
+              <p>
+                Markup = precio ÷ costo = {formatBs(price)} ÷ {formatBs(costNum)} ={" "}
+                <span className="font-bold">{markup({ cost: costNum, price }).toFixed(2)}×</span>
+              </p>
+              <p>
+                Margen = (precio − costo) ÷ precio = {formatBs(gainPerUnit)} ÷ {formatBs(price)} ={" "}
+                <span className="font-bold">{(marginPct({ cost: costNum, price }) * 100).toFixed(0)}%</span>
+              </p>
+              <p>
+                Con IVA = precio × 1,13 = {formatBs(price)} × 1,13 ={" "}
+                <span className="font-bold">{formatBs(priceConFactura)}</span>
+              </p>
+            </div>
+
+            <div className="mt-3 flex justify-end">
+              <ConceptPopover conceptKey="markup-vs-margen" label="Markup vs. Margen: ¿por qué son distintos?" variant="on-primary" />
             </div>
           </div>
         </section>

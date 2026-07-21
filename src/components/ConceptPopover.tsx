@@ -2,7 +2,15 @@ import * as Popover from "@radix-ui/react-popover";
 import { findConcept } from "@/lib/concepts";
 import { HelpCircle } from "lucide-react";
 
-export function ConceptPopover({ conceptKey, label }: { conceptKey: string; label?: string }) {
+export function ConceptPopover({
+  conceptKey,
+  label,
+  variant = "default",
+}: {
+  conceptKey: string;
+  label?: string;
+  variant?: "default" | "on-primary";
+}) {
   const c = findConcept(conceptKey);
   if (!c) return null;
   return (
@@ -10,7 +18,11 @@ export function ConceptPopover({ conceptKey, label }: { conceptKey: string; labe
       <Popover.Trigger asChild>
         <button
           type="button"
-          className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-primary/70 transition-opacity hover:text-primary"
+          className={
+            variant === "on-primary"
+              ? "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground/70 transition-opacity hover:text-primary-foreground"
+              : "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-primary/70 transition-opacity hover:text-primary"
+          }
         >
           <HelpCircle className="size-3" />
           {label ?? "¿Qué es?"}

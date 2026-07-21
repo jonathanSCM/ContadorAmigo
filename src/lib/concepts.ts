@@ -164,6 +164,38 @@ export const CONCEPTS: Concept[] = [
     example: "Si compras Bs 1.000 con factura, generas Bs 130 de crédito fiscal que reduce el IVA que pagarás.",
   },
   {
+    key: "markup",
+    term: "Markup (multiplicador del costo)",
+    short: "Por cuánto multiplicas tu costo para llegar al precio.",
+    full:
+      "El markup es el precio de venta dividido entre el costo: precio ÷ costo. Te dice 'cuántas veces tu costo' es el precio final. No es lo mismo que el margen: un markup de 2× no significa 200% de margen, significa que la mitad del precio es ganancia y la otra mitad es costo.",
+    example: "Costo Bs 40, precio Bs 88,89 → 88,89 ÷ 40 = 2,22×. Cada Bs 1 que gastas en producir, lo vendes en Bs 2,22.",
+  },
+  {
+    key: "margen-real",
+    term: "Margen real (margen sobre precio)",
+    short: "Qué porcentaje del precio de venta es ganancia.",
+    full:
+      "El margen real se calcula como (precio − costo) ÷ precio, es decir, sobre el precio de venta, no sobre el costo. Es la fuente de confusión más común al poner precios: mucha gente cree que un margen del 55% significa multiplicar el costo por 1,55, pero en realidad significa que el 55% de lo que cobras es ganancia neta de esa unidad.",
+    example: "Costo Bs 40, precio Bs 88,89 → ganancia Bs 48,89 → 48,89 ÷ 88,89 = 55%. De cada Bs 100 que cobras, Bs 55 son ganancia.",
+  },
+  {
+    key: "markup-vs-margen",
+    term: "Markup vs. Margen: no son lo mismo",
+    short: "El markup se calcula sobre el costo; el margen, sobre el precio.",
+    full:
+      "Son las dos caras de la misma operación pero con bases distintas. Markup = (precio − costo) ÷ costo (sobre lo que gastaste). Margen = (precio − costo) ÷ precio (sobre lo que cobras). Por eso un margen del 50% no es un markup de 1,5× — es un markup de 2×. Cuanto más alto el margen deseado, más rápido crece el markup necesario, sobre todo pasando el 70-80%.",
+    example: "Margen 50% → markup 2× (precio = costo × 2). Margen 55% → markup 2,22×. Margen 75% → markup 4×.",
+  },
+  {
+    key: "precio-con-iva",
+    term: "Precio con IVA (precio de factura)",
+    short: "Lo que cobras si emites factura: precio + 13%.",
+    full:
+      "El precio que calculas con tu margen es tu precio 'neto' — lo que realmente te queda a ti. Si emites factura, debes cobrar ese precio más el 13% de IVA, porque ese 13% no es tuyo: lo recaudas para entregarlo al SIN en tu declaración mensual. Si no facturas, cobras el precio neto directamente y no hay IVA de por medio.",
+    example: "Precio neto Bs 88,89 → con factura cobras Bs 88,89 × 1,13 = Bs 100,44. Los Bs 11,55 de diferencia son IVA, no ganancia.",
+  },
+  {
     key: "balance-general",
     term: "Balance General",
     short: "Foto de lo que tienes, lo que debes y lo que es realmente tuyo.",
