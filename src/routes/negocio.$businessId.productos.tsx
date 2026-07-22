@@ -6,6 +6,7 @@ import { formatBs, IVA_RATE } from "@/lib/tax";
 import { marginPct, markup, priceForMargin } from "@/lib/pricing";
 import { addProduct, deleteProduct, listProducts, type Product } from "@/lib/products.server";
 import { listMovements } from "@/lib/movements.server";
+import { cachedCall, invalidateCache } from "@/lib/query-cache";
 import { monthlyFixedCosts } from "@/lib/analysis";
 import { AlertTriangle, Trash2, Trophy } from "lucide-react";
 
@@ -46,11 +47,14 @@ function Productos() {
   const [nCost, setNCost] = useState("");
   const [nPrice, setNPrice] = useState("");
 
-  const refresh = () => listProducts({ data: businessId }).then(setProducts);
+  const refresh = () => {
+    invalidateCache(`products:${businessId}`);
+    return listProducts({ data: businessId }).then(setProducts);
+  };
 
   useEffect(() => {
-    refresh();
-    listMovements({ data: businessId }).then((movs) =>
+    cachedCall(`products:${businessId}`, () => listProducts({ data: businessId })).then(setProducts);
+    cachedCall(`movements:${businessId}`, () => listMovements({ data: businessId })).then((movs) =>
       setFixedCosts(Math.round(monthlyFixedCosts(movs))),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps

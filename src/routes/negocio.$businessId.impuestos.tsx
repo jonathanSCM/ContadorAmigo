@@ -2,6 +2,7 @@ import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { ConceptPopover } from "@/components/ConceptPopover";
 import { listMovements } from "@/lib/movements.server";
+import { cachedCall } from "@/lib/query-cache";
 import { updateBusiness } from "@/lib/businesses.server";
 import type { Movement } from "@/lib/storage";
 import { formatBs, IT_RATE, IUE_RATE, nextTaxDue } from "@/lib/tax";
@@ -56,7 +57,7 @@ function Impuestos() {
   const [sector, setSectorState] = useState<Sector>(business.sector ?? DEFAULT_SECTOR);
 
   useEffect(() => {
-    listMovements({ data: businessId }).then(setMovs);
+    cachedCall(`movements:${businessId}`, () => listMovements({ data: businessId })).then(setMovs);
   }, [businessId]);
 
   useEffect(() => {

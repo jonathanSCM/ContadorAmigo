@@ -2,6 +2,7 @@ import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ConceptPopover } from "@/components/ConceptPopover";
 import { listMovements } from "@/lib/movements.server";
+import { cachedCall } from "@/lib/query-cache";
 import type { Movement } from "@/lib/storage";
 import { balance, calcMonthly, formatBs, healthStatus, nextTaxDue, IVA_RATE } from "@/lib/tax";
 import { profitAndLoss, type PnL } from "@/lib/analysis";
@@ -29,7 +30,7 @@ function Index() {
   const [conceptIdx, setConceptIdx] = useState(0);
 
   useEffect(() => {
-    listMovements({ data: businessId }).then(setMovs);
+    cachedCall(`movements:${businessId}`, () => listMovements({ data: businessId })).then(setMovs);
     setConceptIdx(Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % CONCEPTS.length);
   }, [businessId]);
 

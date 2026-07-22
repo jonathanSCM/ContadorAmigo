@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ConceptPopover } from "@/components/ConceptPopover";
 import { listMovements } from "@/lib/movements.server";
+import { cachedCall } from "@/lib/query-cache";
 import { updateBusiness } from "@/lib/businesses.server";
 import type { Movement } from "@/lib/storage";
 import { balance, formatBs } from "@/lib/tax";
@@ -39,7 +40,7 @@ function Analisis() {
   const [editingGoal, setEditingGoal] = useState(false);
 
   useEffect(() => {
-    listMovements({ data: businessId }).then(setMovs);
+    cachedCall(`movements:${businessId}`, () => listMovements({ data: businessId })).then(setMovs);
   }, [businessId]);
 
   const pnl = useMemo(() => profitAndLoss(movs, period), [movs, period]);

@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { ConceptPopover } from "@/components/ConceptPopover";
 import { formatBs } from "@/lib/tax";
 import { listMovements } from "@/lib/movements.server";
+import { cachedCall, invalidateCache } from "@/lib/query-cache";
 import type { Movement } from "@/lib/storage";
 import {
   addBalanceItem,
@@ -40,11 +41,14 @@ function Balance() {
   const [items, setItems] = useState<BalanceItem[]>([]);
   const [movs, setMovs] = useState<Movement[]>([]);
 
-  const refresh = () => listBalanceItems({ data: businessId }).then(setItems);
+  const refresh = () => {
+    invalidateCache(`balanceItems:${businessId}`);
+    return listBalanceItems({ data: businessId }).then(setItems);
+  };
 
   useEffect(() => {
-    refresh();
-    listMovements({ data: businessId }).then(setMovs);
+    cachedCall(`balanceItems:${businessId}`, () => listBalanceItems({ data: businessId })).then(setItems);
+    cachedCall(`movements:${businessId}`, () => listMovements({ data: businessId })).then(setMovs);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessId]);
 

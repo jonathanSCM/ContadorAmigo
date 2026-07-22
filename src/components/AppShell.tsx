@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { logoutUser } from "@/lib/auth.server";
 import { updateBusiness, type BusinessRow } from "@/lib/businesses.server";
 import { listMovements } from "@/lib/movements.server";
+import { cachedCall } from "@/lib/query-cache";
 import { calcMonthly, healthStatus } from "@/lib/tax";
 import { AssistantWidget } from "@/components/AssistantWidget";
 import { BusinessSwitcher } from "@/components/BusinessSwitcher";
@@ -38,7 +39,7 @@ export function AppShell({ children, business }: { children: ReactNode; business
     // Solo al cambiar de negocio, no en cada navegación entre pestañas: antes
     // esto traía TODOS los movimientos del negocio en cada clic del menú,
     // que era la causa principal de la lentitud al cambiar de apartado.
-    listMovements({ data: business.id }).then((rows) => {
+    cachedCall(`movements:${business.id}`, () => listMovements({ data: business.id })).then((rows) => {
       setHealth(healthStatus(calcMonthly(rows)));
     });
   }, [business.id]);

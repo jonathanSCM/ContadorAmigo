@@ -11,6 +11,7 @@ import {
   updateMovement,
 } from "@/lib/movements.server";
 import { loadDemoProducts } from "@/lib/products.server";
+import { cachedCall, invalidateCache } from "@/lib/query-cache";
 import type { Movement, MovementType } from "@/lib/storage";
 import { formatBs, IVA_RATE } from "@/lib/tax";
 import { ChevronLeft, ChevronRight, Download, Pencil, RotateCcw, Search, Trash2, X } from "lucide-react";
@@ -51,10 +52,13 @@ function Movimientos() {
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
 
-  const refresh = () => listMovements({ data: businessId }).then(setMovs);
+  const refresh = () => {
+    invalidateCache(`movements:${businessId}`);
+    return listMovements({ data: businessId }).then(setMovs);
+  };
 
   useEffect(() => {
-    refresh();
+    cachedCall(`movements:${businessId}`, () => listMovements({ data: businessId })).then(setMovs);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessId]);
 
@@ -167,6 +171,7 @@ function Movimientos() {
     if (!confirm("¿Cargar el negocio de ejemplo? Se reemplazarán tus datos actuales.")) return;
     await loadDemoMovements({ data: businessId });
     await loadDemoProducts({ data: businessId });
+    invalidateCache(`products:${businessId}`);
     await refresh();
     resetForm();
     toast.success("Negocio de ejemplo cargado");
