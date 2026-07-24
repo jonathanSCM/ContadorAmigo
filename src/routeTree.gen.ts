@@ -15,6 +15,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NegocioBusinessIdRouteImport } from './routes/negocio.$businessId'
 import { Route as NegocioBusinessIdIndexRouteImport } from './routes/negocio.$businessId.index'
+import { Route as NegocioBusinessIdProyeccionRouteImport } from './routes/negocio.$businessId.proyeccion'
 import { Route as NegocioBusinessIdProductosRouteImport } from './routes/negocio.$businessId.productos'
 import { Route as NegocioBusinessIdMovimientosRouteImport } from './routes/negocio.$businessId.movimientos'
 import { Route as NegocioBusinessIdImpuestosRouteImport } from './routes/negocio.$businessId.impuestos'
@@ -53,6 +54,12 @@ const NegocioBusinessIdIndexRoute = NegocioBusinessIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => NegocioBusinessIdRoute,
 } as any)
+const NegocioBusinessIdProyeccionRoute =
+  NegocioBusinessIdProyeccionRouteImport.update({
+    id: '/proyeccion',
+    path: '/proyeccion',
+    getParentRoute: () => NegocioBusinessIdRoute,
+  } as any)
 const NegocioBusinessIdProductosRoute =
   NegocioBusinessIdProductosRouteImport.update({
     id: '/productos',
@@ -109,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/negocio/$businessId/impuestos': typeof NegocioBusinessIdImpuestosRoute
   '/negocio/$businessId/movimientos': typeof NegocioBusinessIdMovimientosRoute
   '/negocio/$businessId/productos': typeof NegocioBusinessIdProductosRoute
+  '/negocio/$businessId/proyeccion': typeof NegocioBusinessIdProyeccionRoute
   '/negocio/$businessId/': typeof NegocioBusinessIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -123,6 +131,7 @@ export interface FileRoutesByTo {
   '/negocio/$businessId/impuestos': typeof NegocioBusinessIdImpuestosRoute
   '/negocio/$businessId/movimientos': typeof NegocioBusinessIdMovimientosRoute
   '/negocio/$businessId/productos': typeof NegocioBusinessIdProductosRoute
+  '/negocio/$businessId/proyeccion': typeof NegocioBusinessIdProyeccionRoute
   '/negocio/$businessId': typeof NegocioBusinessIdIndexRoute
 }
 export interface FileRoutesById {
@@ -139,6 +148,7 @@ export interface FileRoutesById {
   '/negocio/$businessId/impuestos': typeof NegocioBusinessIdImpuestosRoute
   '/negocio/$businessId/movimientos': typeof NegocioBusinessIdMovimientosRoute
   '/negocio/$businessId/productos': typeof NegocioBusinessIdProductosRoute
+  '/negocio/$businessId/proyeccion': typeof NegocioBusinessIdProyeccionRoute
   '/negocio/$businessId/': typeof NegocioBusinessIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/negocio/$businessId/impuestos'
     | '/negocio/$businessId/movimientos'
     | '/negocio/$businessId/productos'
+    | '/negocio/$businessId/proyeccion'
     | '/negocio/$businessId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/negocio/$businessId/impuestos'
     | '/negocio/$businessId/movimientos'
     | '/negocio/$businessId/productos'
+    | '/negocio/$businessId/proyeccion'
     | '/negocio/$businessId'
   id:
     | '__root__'
@@ -185,6 +197,7 @@ export interface FileRouteTypes {
     | '/negocio/$businessId/impuestos'
     | '/negocio/$businessId/movimientos'
     | '/negocio/$businessId/productos'
+    | '/negocio/$businessId/proyeccion'
     | '/negocio/$businessId/'
   fileRoutesById: FileRoutesById
 }
@@ -238,6 +251,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/negocio/$businessId/'
       preLoaderRoute: typeof NegocioBusinessIdIndexRouteImport
+      parentRoute: typeof NegocioBusinessIdRoute
+    }
+    '/negocio/$businessId/proyeccion': {
+      id: '/negocio/$businessId/proyeccion'
+      path: '/proyeccion'
+      fullPath: '/negocio/$businessId/proyeccion'
+      preLoaderRoute: typeof NegocioBusinessIdProyeccionRouteImport
       parentRoute: typeof NegocioBusinessIdRoute
     }
     '/negocio/$businessId/productos': {
@@ -300,6 +320,7 @@ interface NegocioBusinessIdRouteChildren {
   NegocioBusinessIdImpuestosRoute: typeof NegocioBusinessIdImpuestosRoute
   NegocioBusinessIdMovimientosRoute: typeof NegocioBusinessIdMovimientosRoute
   NegocioBusinessIdProductosRoute: typeof NegocioBusinessIdProductosRoute
+  NegocioBusinessIdProyeccionRoute: typeof NegocioBusinessIdProyeccionRoute
   NegocioBusinessIdIndexRoute: typeof NegocioBusinessIdIndexRoute
 }
 
@@ -311,6 +332,7 @@ const NegocioBusinessIdRouteChildren: NegocioBusinessIdRouteChildren = {
   NegocioBusinessIdImpuestosRoute: NegocioBusinessIdImpuestosRoute,
   NegocioBusinessIdMovimientosRoute: NegocioBusinessIdMovimientosRoute,
   NegocioBusinessIdProductosRoute: NegocioBusinessIdProductosRoute,
+  NegocioBusinessIdProyeccionRoute: NegocioBusinessIdProyeccionRoute,
   NegocioBusinessIdIndexRoute: NegocioBusinessIdIndexRoute,
 }
 

@@ -4,7 +4,12 @@
 import type { Movement } from "./storage";
 import { profitAndLoss } from "./analysis";
 
-export type BalanceCategory = "activo_corriente" | "activo_fijo" | "pasivo" | "capital_propio";
+export type BalanceCategory =
+  | "activo_corriente"
+  | "activo_fijo"
+  | "pasivo_corriente"
+  | "pasivo_no_corriente"
+  | "capital_propio";
 
 export interface BalanceItem {
   id: string;
@@ -19,6 +24,8 @@ export interface BalanceSheet {
   activoCorriente: number;
   activoFijo: number;
   activoTotal: number;
+  pasivoCorriente: number;
+  pasivoNoCorriente: number;
   pasivoTotal: number;
   capitalPropio: number;
   utilidadesAcumuladas: number;
@@ -33,7 +40,11 @@ export function balanceSheet(items: BalanceItem[], movs: Movement[]): BalanceShe
   const activoCorriente = sum("activo_corriente");
   const activoFijo = sum("activo_fijo");
   const activoTotal = activoCorriente + activoFijo;
-  const pasivoTotal = sum("pasivo");
+  // "pasivo" es el valor legado (antes de separar corto/largo plazo): se cuenta
+  // como corriente para no perder datos de negocios que ya lo tenían cargado.
+  const pasivoCorriente = sum("pasivo_corriente") + sum("pasivo" as BalanceCategory);
+  const pasivoNoCorriente = sum("pasivo_no_corriente");
+  const pasivoTotal = pasivoCorriente + pasivoNoCorriente;
   const capitalPropio = sum("capital_propio");
   const utilidadesAcumuladas = profitAndLoss(movs, "todo").utilidadNeta;
   const patrimonioTotal = capitalPropio + utilidadesAcumuladas;
@@ -42,6 +53,8 @@ export function balanceSheet(items: BalanceItem[], movs: Movement[]): BalanceShe
     activoCorriente,
     activoFijo,
     activoTotal,
+    pasivoCorriente,
+    pasivoNoCorriente,
     pasivoTotal,
     capitalPropio,
     utilidadesAcumuladas,

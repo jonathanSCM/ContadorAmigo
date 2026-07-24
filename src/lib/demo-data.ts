@@ -115,13 +115,17 @@ export const DEMO_PRODUCTS = [
   { name: "Torta de bodas (3 pisos)", cost: 320, price: 850 },
 ];
 
-export const DEMO_BALANCE_ITEMS: { category: "activo_corriente" | "activo_fijo" | "pasivo" | "capital_propio"; name: string; amount: number }[] = [
+export const DEMO_BALANCE_ITEMS: {
+  category: "activo_corriente" | "activo_fijo" | "pasivo_corriente" | "pasivo_no_corriente" | "capital_propio";
+  name: string;
+  amount: number;
+}[] = [
   { category: "activo_corriente", name: "Caja y bancos", amount: 3500 },
   { category: "activo_corriente", name: "Inventario de insumos (harina, chocolate, envases)", amount: 1800 },
   { category: "activo_fijo", name: "Horno industrial", amount: 8500 },
   { category: "activo_fijo", name: "Mobiliario y vitrinas", amount: 2200 },
   { category: "activo_fijo", name: "Vehículo de reparto", amount: 12000 },
-  { category: "pasivo", name: "Préstamo bancario (compra de horno)", amount: 6000 },
-  { category: "pasivo", name: "Cuentas por pagar a proveedores", amount: 1200 },
+  { category: "pasivo_corriente", name: "Cuentas por pagar a proveedores", amount: 1200 },
+  { category: "pasivo_no_corriente", name: "Préstamo bancario (compra de horno)", amount: 6000 },
   { category: "capital_propio", name: "Capital inicial del negocio", amount: 7400 },
 ];

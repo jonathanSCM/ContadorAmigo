@@ -203,6 +203,30 @@ export const CONCEPTS: Concept[] = [
       "El Balance General (Estado de Situación Financiera) muestra, en una fecha dada, tus Activos (lo que tu negocio tiene: caja, banco, inventario, equipos), tus Pasivos (lo que debes: préstamos, cuentas por pagar) y tu Patrimonio (lo que realmente te pertenece: tu capital más las utilidades acumuladas). A diferencia del Estado de Resultados, que mide un período, el Balance mide un momento exacto. Aquí es un resumen simplificado que tú actualizas manualmente, no una contabilidad de partida doble.",
     example: "Si tienes Bs 5.000 en activos y debes Bs 2.000, tu patrimonio es Bs 3.000.",
   },
+  {
+    key: "capital-trabajo",
+    term: "Capital de trabajo",
+    short: "El dinero que necesitas para operar día a día.",
+    full:
+      "Es el dinero disponible para cubrir la operación normal del negocio (comprar insumos, pagar sueldos, cubrir gastos) mientras esperas cobrar tus ventas. Se distingue de otros tipos de capital: el capital de inversión (para comprar activos como maquinaria o local) y el capital de deuda (dinero prestado que hay que devolver con interés). Un negocio puede tener buenas ventas y aun así quedarse sin capital de trabajo si todo su dinero está inmovilizado en inventario o cuentas por cobrar.",
+    example: "Una panadería necesita capital de trabajo para comprar harina y pagar al personal antes de vender el pan del día.",
+  },
+  {
+    key: "fuentes-financiamiento",
+    term: "Fuentes de financiamiento",
+    short: "De dónde puede salir el dinero para tu negocio.",
+    full:
+      "Son las distintas formas de conseguir capital para arrancar o hacer crecer un emprendimiento: bancos (préstamos con interés y garantías), crowdfunding (muchas personas aportan montos pequeños a cambio de una recompensa o participación), inversionistas ángeles (personas o fondos que aportan capital a cambio de una parte de la empresa), y capital propio o de amigos y familia. Cada fuente tiene distinto costo, plazo y nivel de control que cedes sobre el negocio.",
+    example: "Un banco presta Bs 20.000 a devolver en 2 años con interés; un inversionista ángel aporta Bs 20.000 a cambio del 15% del negocio, sin exigir devolución mensual.",
+  },
+  {
+    key: "catalogo-cuentas",
+    term: "Catálogo de cuentas",
+    short: "La lista ordenada de todas las cuentas que usa tu negocio.",
+    full:
+      "Es la lista organizada de las categorías donde se clasifica cada movimiento y bien del negocio: activo circulante (corto plazo), activo no corriente (largo plazo), pasivo corriente, pasivo no corriente, patrimonio, ingresos operativos, costos y gastos. Tener un catálogo básico, aunque sea simple, ayuda a que todos los movimientos se registren de forma consistente y a que el Balance y el Estado de Resultados cuadren correctamente.",
+    example: "En ContadorAmigo, el Balance ya usa un catálogo básico: Activo corriente, Activo fijo, Pasivo corriente, Pasivo no corriente y Capital propio.",
+  },
 ];
 
 export function findConcept(key: string): Concept | undefined {

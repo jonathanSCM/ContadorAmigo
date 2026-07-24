@@ -32,7 +32,18 @@ export const Route = createFileRoute("/negocio/$businessId/balance")({
 const SECTIONS: { category: BalanceCategory; title: string; hint: string; placeholder: string }[] = [
   { category: "activo_corriente", title: "Activo corriente", hint: "Caja, banco, inventario", placeholder: "Ej: Caja" },
   { category: "activo_fijo", title: "Activo fijo", hint: "Equipos, muebles, vehículos", placeholder: "Ej: Equipos" },
-  { category: "pasivo", title: "Pasivos", hint: "Préstamos, cuentas por pagar", placeholder: "Ej: Préstamo BNB" },
+  {
+    category: "pasivo_corriente",
+    title: "Pasivo corriente",
+    hint: "Deudas a pagar en menos de 12 meses",
+    placeholder: "Ej: Proveedores por pagar",
+  },
+  {
+    category: "pasivo_no_corriente",
+    title: "Pasivo no corriente",
+    hint: "Deudas a más de 1 año (préstamos, hipotecas)",
+    placeholder: "Ej: Préstamo bancario",
+  },
   { category: "capital_propio", title: "Capital propio", hint: "Lo que pusiste al iniciar", placeholder: "Ej: Capital inicial" },
 ];
 
@@ -100,7 +111,9 @@ function Balance() {
         {/* Pasivos + Patrimonio */}
         <div className="space-y-6">
           <h2 className="px-1 font-serif text-2xl italic">Pasivos y Patrimonio</h2>
-          {SECTIONS.filter((s) => s.category === "pasivo").map((s) => (
+          {SECTIONS.filter(
+            (s) => s.category === "pasivo_corriente" || s.category === "pasivo_no_corriente",
+          ).map((s) => (
             <BalanceSection
               key={s.category}
               section={s}
