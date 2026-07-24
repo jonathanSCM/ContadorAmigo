@@ -11,6 +11,7 @@ import {
   updateMovement,
 } from "@/lib/movements.server";
 import { loadDemoProducts } from "@/lib/products.server";
+import { loadDemoBalanceItems } from "@/lib/balance.server";
 import { cachedCall, invalidateCache } from "@/lib/query-cache";
 import type { Movement, MovementType } from "@/lib/storage";
 import { formatBs, IVA_RATE } from "@/lib/tax";
@@ -171,7 +172,9 @@ function Movimientos() {
     if (!confirm("¿Cargar el negocio de ejemplo? Se reemplazarán tus datos actuales.")) return;
     await loadDemoMovements({ data: businessId });
     await loadDemoProducts({ data: businessId });
+    await loadDemoBalanceItems({ data: businessId });
     invalidateCache(`products:${businessId}`);
+    invalidateCache(`balanceItems:${businessId}`);
     await refresh();
     resetForm();
     toast.success("Negocio de ejemplo cargado");

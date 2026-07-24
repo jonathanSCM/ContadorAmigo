@@ -5,6 +5,7 @@ import { db } from "@/db/client";
 import { balanceItems } from "@/db/schema";
 import { requireUserId } from "./auth.server";
 import { assertOwnsBusiness } from "./businesses.server";
+import { DEMO_BALANCE_ITEMS } from "./demo-data";
 import type { BalanceCategory, BalanceItem } from "./balance";
 
 export type { BalanceItem, BalanceCategory };
@@ -41,6 +42,22 @@ export const updateBalanceItem = createServerFn({ method: "POST" })
         .where(and(eq(balanceItems.id, id), eq(balanceItems.businessId, businessId)));
     }
     return { ok: true };
+  });
+
+export const loadDemoBalanceItems = createServerFn({ method: "POST" })
+  .validator((businessId: string) => businessId)
+  .handler(async ({ data: businessId }): Promise<{ count: number }> => {
+    const userId = await requireUserId();
+    await assertOwnsBusiness(userId, businessId);
+    await db.delete(balanceItems).where(eq(balanceItems.businessId, businessId));
+    const rows = DEMO_BALANCE_ITEMS.map((i) => ({
+      id: crypto.randomUUID(),
+      businessId,
+      createdAt: new Date().toISOString(),
+      ...i,
+    }));
+    await db.insert(balanceItems).values(rows);
+    return { count: rows.length };
   });
 
 export const deleteBalanceItem = createServerFn({ method: "POST" })
